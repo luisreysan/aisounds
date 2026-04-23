@@ -1,0 +1,51 @@
+{
+  "name": "aisounds",
+  "version": "0.0.0",
+  "description": "CLI to install and manage AI Sounds packs for Cursor, VS Code, Claude Code, Windsurf and more.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "aisounds": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "aisounds",
+    "cursor",
+    "claude-code",
+    "vscode",
+    "windsurf",
+    "sound-pack",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node ./dist/index.js",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@aisounds/core": "workspace:*",
+    "adm-zip": "^0.5.16",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "inquirer": "^12.3.0",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.1.1"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  }
+}
