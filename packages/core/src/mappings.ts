@@ -9,11 +9,11 @@ import type { SoundEvent } from './events.js'
 export type SupportedTool = 'cursor' | 'vscode' | 'claude-code' | 'windsurf' | 'aider'
 
 export const CURSOR_EVENT_MAP: Partial<Record<SoundEvent, string>> = {
-  task_complete: 'onAgentTaskComplete',
-  prompt_sent: 'onPromptSubmit',
-  tool_called: 'onToolCall',
-  approval_needed: 'onApprovalRequired',
-  session_start: 'onSessionStart',
+  task_complete: 'stop',
+  task_failed: 'stop',
+  session_start: 'sessionStart',
+  prompt_sent: 'beforeSubmitPrompt',
+  tool_called: 'preToolUse',
 }
 
 export const CLAUDE_EVENT_MAP: Partial<Record<SoundEvent, string>> = {

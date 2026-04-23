@@ -1,0 +1,91 @@
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
+
+import type { SupportedTool } from '@aisounds/core'
+
+import { allScopePaths, resolveScope, type Scope } from './paths.js'
+
+export interface InstalledPack {
+  slug: string
+  version: string
+  name: string
+  tools: SupportedTool[]
+  scope: Scope
+  installedAt: string
+  updatedAt: string
+  packDir: string
+}
+
+interface StateFile {
+  version: 1
+  packs: InstalledPack[]
+}
+
+const EMPTY_STATE: StateFile = { version: 1, packs: [] }
+
+async function readStateFile(statePath: string): Promise<StateFile> {
+  try {
+    const raw = await fs.readFile(statePath, 'utf8')
+    const parsed = JSON.parse(raw) as Partial<StateFile>
+    return {
+      version: 1,
+      packs: Array.isArray(parsed.packs) ? (parsed.packs as InstalledPack[]) : [],
+    }
+  } catch (err) {
+    if (isNotFound(err)) return { ...EMPTY_STATE }
+    throw err
+  }
+}
+
+async function writeStateFile(statePath: string, state: StateFile): Promise<void> {
+  await fs.mkdir(path.dirname(statePath), { recursive: true })
+  await fs.writeFile(statePath, JSON.stringify(state, null, 2) + '\n', 'utf8')
+}
+
+/** Returns every installed pack across both scopes, project first. */
+export async function listInstalled(cwd: string = process.cwd()): Promise<InstalledPack[]> {
+  const out: InstalledPack[] = []
+  for (const { paths } of allScopePaths(cwd)) {
+    const state = await readStateFile(paths.statePath)
+    out.push(...state.packs)
+  }
+  return out
+}
+
+export async function findInstalled(
+  slug: string,
+  cwd: string = process.cwd(),
+): Promise<InstalledPack | null> {
+  for (const { paths } of allScopePaths(cwd)) {
+    const state = await readStateFile(paths.statePath)
+    const found = state.packs.find((p) => p.slug === slug)
+    if (found) return found
+  }
+  return null
+}
+
+export async function upsertInstalled(
+  entry: InstalledPack,
+  cwd: string = process.cwd(),
+): Promise<void> {
+  const { statePath } = resolveScope(entry.scope, cwd)
+  const state = await readStateFile(statePath)
+  const filtered = state.packs.filter((p) => p.slug !== entry.slug)
+  filtered.push(entry)
+  await writeStateFile(statePath, { version: 1, packs: filtered })
+}
+
+export async function removeInstalled(
+  slug: string,
+  scope: Scope,
+  cwd: string = process.cwd(),
+): Promise<void> {
+  const { statePath } = resolveScope(scope, cwd)
+  const state = await readStateFile(statePath)
+  const filtered = state.packs.filter((p) => p.slug !== slug)
+  await writeStateFile(statePath, { version: 1, packs: filtered })
+}
+
+function isNotFound(err: unknown): boolean {
+  return !!err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'ENOENT'
+}
