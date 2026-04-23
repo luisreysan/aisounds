@@ -6,7 +6,14 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { ALL_EVENTS, EVENT_SPEC, type SoundEvent } from '@aisounds/core'
+import {
+  ALL_EVENTS,
+  EVENT_SPEC,
+  hookMappingsForEvent,
+  supportedEventsForTools,
+  type SoundEvent,
+  type SupportedTool,
+} from '@aisounds/core'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -71,9 +78,14 @@ export function UploadWizard() {
 
   const baseSlug = useMemo(() => slugify(name) || '—', [name])
 
+  const filteredEvents: SoundEvent[] = useMemo(
+    () => supportedEventsForTools(tools as SupportedTool[]),
+    [tools],
+  )
+
   const requiredEvents: SoundEvent[] = useMemo(
-    () => ALL_EVENTS.filter((e) => EVENT_SPEC[e].required),
-    [],
+    () => filteredEvents.filter((e) => EVENT_SPEC[e].required),
+    [filteredEvents],
   )
 
   const canProceedFromStep1 = name.trim().length >= 2 && name.trim().length <= 80
@@ -249,6 +261,8 @@ export function UploadWizard() {
           {step === 2 && draft ? (
             <StepSounds
               sounds={sounds}
+              events={filteredEvents}
+              tools={tools}
               onUpload={uploadSound}
               onBack={() => setStep(1)}
               onNext={() => setStep(3)}
@@ -492,12 +506,19 @@ function StepMetadata(props: {
 
 function StepSounds(props: {
   sounds: Record<string, SoundState>
+  events: SoundEvent[]
+  tools: string[]
   onUpload: (event: SoundEvent, file: File) => void
   onBack: () => void
   onNext: () => void
   onDiscard: () => void
   canProceed: boolean
 }) {
+  const toolLabel = (slug: string) => {
+    const found = TOOL_OPTIONS.find((t) => t.slug === slug)
+    return found?.label ?? slug
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -505,17 +526,30 @@ function StepSounds(props: {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">
-          Upload audio for each AISE event you want to map. You must provide at least the two
-          required events (<code className="font-mono text-xs">task_complete</code> and{' '}
-          <code className="font-mono text-xs">task_failed</code>). Files are transcoded to OGG
-          and MP3 server-side — max 1 MB and 10 seconds each.
+          Upload audio for each event supported by your selected tools. You must provide at least
+          the required events. Files are transcoded to OGG and MP3 server-side — max 1 MB and 10
+          seconds each.
         </p>
 
+        {props.tools.length > 0 ? (
+          <div className="flex items-center gap-2 rounded-md border border-border/50 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+            <span>Showing {props.events.length} events supported by:</span>
+            <div className="flex gap-1.5">
+              {props.tools.map((t) => (
+                <Badge key={t} variant="secondary" className="h-4 px-1.5 text-[10px]">
+                  {toolLabel(t)}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <ul className="flex flex-col gap-2">
-          {ALL_EVENTS.map((event) => (
+          {props.events.map((event) => (
             <SoundRow
               key={event}
               event={event}
+              tools={props.tools}
               state={props.sounds[event]}
               onUpload={(file) => props.onUpload(event, file)}
             />
@@ -546,15 +580,19 @@ function StepSounds(props: {
 
 function SoundRow({
   event,
+  tools,
   state,
   onUpload,
 }: {
   event: SoundEvent
+  tools: string[]
   state: SoundState | undefined
   onUpload: (file: File) => void
 }) {
   const spec = EVENT_SPEC[event]
   const inputId = `file-${event}`
+  const hookMappings = hookMappingsForEvent(tools as SupportedTool[], event)
+  const toolLabel = (slug: string) => TOOL_OPTIONS.find((t) => t.slug === slug)?.label ?? slug
 
   return (
     <li
@@ -579,6 +617,15 @@ function SoundRow({
               </Badge>
             ) : null}
           </div>
+          {hookMappings.length > 0 ? (
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {hookMappings.map((m) => (
+                <Badge key={`${event}-${m.tool}-${m.hook}`} variant="outline" className="h-4 px-1.5 text-[10px]">
+                  {toolLabel(m.tool)}: {m.hook}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
         </div>
         <StatusIcon status={state?.status ?? 'idle'} />
       </div>

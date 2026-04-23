@@ -3,7 +3,7 @@ import { fetchBundle, ApiError } from '../lib/api.js'
 import { logger } from '../lib/logger.js'
 import { resolveScope, type Scope } from '../lib/paths.js'
 import { currentPlatform } from '../lib/platform.js'
-import { upsertInstalled } from '../lib/state.js'
+import { getActivePack, setActivePack, upsertInstalled } from '../lib/state.js'
 import { extractBundle } from '../lib/unzip.js'
 import { getCliVersion } from '../lib/version.js'
 import type { SupportedTool } from '@aisounds/core'
@@ -94,11 +94,23 @@ export async function install(slug: string, opts: InstallOptions): Promise<void>
     cwd,
   )
 
-  logger.success(
-    `Installed ${extracted.manifest.pack.name} for ${installer.label} (${result.entryCount} hook${result.entryCount === 1 ? '' : 's'})`,
-  )
+  const currentActive = await getActivePack(scope, cwd)
+  if (!currentActive) {
+    await setActivePack(slug, scope, cwd)
+    logger.success(
+      `Installed and activated ${extracted.manifest.pack.name} for ${installer.label} (${result.entryCount} hook${result.entryCount === 1 ? '' : 's'})`,
+    )
+  } else if (currentActive === slug) {
+    logger.success(
+      `Installed ${extracted.manifest.pack.name} for ${installer.label} (${result.entryCount} hook${result.entryCount === 1 ? '' : 's'})`,
+    )
+  } else {
+    logger.success(
+      `Installed ${extracted.manifest.pack.name} for ${installer.label} (${result.entryCount} hook${result.entryCount === 1 ? '' : 's'})`,
+    )
+    logger.note(`Run 'aisounds activate ${slug}' to switch to this pack.`)
+  }
   logger.note(`Config: ${result.configPath}`)
-  logger.note(`Run 'aisounds remove ${slug}' to undo.`)
 }
 
 async function resolveTool(

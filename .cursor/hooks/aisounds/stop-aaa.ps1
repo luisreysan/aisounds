@@ -32,8 +32,10 @@ try {
   Add-Type -AssemblyName PresentationCore *>&1 | Out-Null
   $player = New-Object System.Windows.Media.MediaPlayer
   $player.Open([uri]$mp3)
+  Start-Sleep -Milliseconds 300
   $player.Play()
-  Start-Sleep -Milliseconds 1950
+  Start-Sleep -Milliseconds 3250
+  $player.Close()
 } catch {
 }
 Write-Output '{}'

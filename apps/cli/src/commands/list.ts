@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
 import { logger } from '../lib/logger.js'
-import { listInstalled } from '../lib/state.js'
+import { getActivePack, listInstalled } from '../lib/state.js'
 
 export interface ListOptions {
   project?: string
@@ -17,15 +17,26 @@ export async function list(opts: ListOptions = {}): Promise<void> {
     return
   }
 
-  const rows = installed.map((p) => ({
-    slug: p.slug,
-    name: p.name,
-    scope: p.scope,
-    tools: p.tools.join(', ') || '-',
-    installedAt: p.installedAt.slice(0, 10),
-  }))
+  const activeProject = await getActivePack('project', cwd)
+  const activeGlobal = await getActivePack('global', cwd)
 
+  const rows = installed.map((p) => {
+    const isActive =
+      (p.scope === 'project' && p.slug === activeProject) ||
+      (p.scope === 'global' && p.slug === activeGlobal)
+    return {
+      slug: p.slug,
+      name: p.name,
+      scope: p.scope,
+      tools: p.tools.join(', ') || '-',
+      installedAt: p.installedAt.slice(0, 10),
+      active: isActive,
+    }
+  })
+
+  const statusCol = 2
   const widths = {
+    status: statusCol,
     slug: Math.max(4, ...rows.map((r) => r.slug.length)),
     name: Math.max(4, ...rows.map((r) => r.name.length)),
     scope: 7,
@@ -34,6 +45,7 @@ export async function list(opts: ListOptions = {}): Promise<void> {
   }
 
   const header = [
+    ''.padEnd(widths.status),
     chalk.bold('SLUG'.padEnd(widths.slug)),
     chalk.bold('NAME'.padEnd(widths.name)),
     chalk.bold('SCOPE'.padEnd(widths.scope)),
@@ -43,14 +55,15 @@ export async function list(opts: ListOptions = {}): Promise<void> {
   console.log(header)
 
   for (const row of rows) {
-    console.log(
-      [
-        row.slug.padEnd(widths.slug),
-        row.name.padEnd(widths.name),
-        row.scope.padEnd(widths.scope),
-        row.tools.padEnd(widths.tools),
-        row.installedAt,
-      ].join('  '),
-    )
+    const marker = row.active ? chalk.green('*') + ' ' : '  '
+    const line = [
+      marker,
+      row.slug.padEnd(widths.slug),
+      row.name.padEnd(widths.name),
+      row.scope.padEnd(widths.scope),
+      row.tools.padEnd(widths.tools),
+      row.installedAt,
+    ].join('  ')
+    console.log(row.active ? chalk.green(line) : line)
   }
 }

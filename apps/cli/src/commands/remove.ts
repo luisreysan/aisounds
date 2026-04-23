@@ -5,7 +5,7 @@ import path from 'node:path'
 
 import { getInstaller, isSupportedTool } from '../installers/index.js'
 import { logger } from '../lib/logger.js'
-import { findInstalled, removeInstalled } from '../lib/state.js'
+import { findInstalled, getActivePack, removeInstalled } from '../lib/state.js'
 import type { Scope } from '../lib/paths.js'
 
 export interface RemoveOptions {
@@ -63,7 +63,14 @@ export async function remove(slug: string, opts: RemoveOptions): Promise<void> {
     )
   }
 
-  await removeInstalled(slug, installed.scope as Scope, cwd)
+  const scope = installed.scope as Scope
+  await removeInstalled(slug, scope, cwd)
+
+  const wasActive = await getActivePack(scope, cwd)
+  if (wasActive === null) {
+    logger.note('No active pack remaining. Install a new one or run aisounds activate <slug>.')
+  }
+
   logger.success(`Uninstalled ${slug}`)
 }
 

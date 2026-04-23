@@ -116,7 +116,11 @@ export default async function PackDetailPage({
                 soundCount={sounds.length}
               />
             </div>
-            <InstallSnippet packSlug={pack.slug} />
+            <InstallSnippet
+              packSlug={pack.slug}
+              packName={pack.name}
+              tools={pack.tool_slugs ?? []}
+            />
           </div>
         </div>
       </section>

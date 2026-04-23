@@ -83,6 +83,8 @@ describe('generateStopScript', () => {
     expect(script).toContain('TrimStart')
     expect(script).toContain('0xFEFF')
     expect(script).toContain("IndexOf('{')")
+    expect(script).toContain('Start-Sleep -Milliseconds 300')
+    expect(script).toContain('$player.Close()')
   })
 
   it('generates a macOS script with afplay that checks status', () => {
@@ -129,6 +131,8 @@ describe('generateSimpleScript', () => {
     expect(script).toContain('Out-Null')
     expect(script).toContain('prompt_sent.mp3')
     expect(script).toContain('Write-Output "{}"')
+    expect(script).toContain('Start-Sleep -Milliseconds 300')
+    expect(script).toContain('$player.Close()')
   })
 
   it('generates a macOS script that drains stdin and plays sound', () => {

@@ -1,5 +1,6 @@
 import { Command } from 'commander'
 
+import { activate } from './commands/activate.js'
 import { info } from './commands/info.js'
 import { install } from './commands/install.js'
 import { list } from './commands/list.js'
@@ -47,6 +48,12 @@ program
   .description('re-install packs whose upstream version changed')
   .option('--project <path>', 'project path for scoped install')
   .action((opts: Parameters<typeof update>[0]) => update(opts))
+
+program
+  .command('activate <slug>')
+  .description('set the active pack whose sounds will play in hooks')
+  .option('--project <path>', 'project path for scoped install')
+  .action((slug: string, opts: Parameters<typeof activate>[1]) => activate(slug, opts))
 
 program
   .command('preview <slug>')

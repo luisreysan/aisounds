@@ -64,12 +64,12 @@ export function playFile(targets: AudioTargets): Promise<void> {
 
 function buildWindowsMp3Hook(mp3AbsPath: string, durationMs: number): string {
   const safePath = path.resolve(mp3AbsPath).replace(/'/g, "''")
-  const waitMs = Math.max(300, durationMs + 200)
+  const waitMs = Math.max(500, durationMs + 1500)
   const inner =
     `Add-Type -AssemblyName PresentationCore; ` +
     `$p = New-Object System.Windows.Media.MediaPlayer; ` +
-    `$p.Open([uri]'${safePath}'); $p.Play(); ` +
-    `Start-Sleep -Milliseconds ${waitMs}`
+    `$p.Open([uri]'${safePath}'); Start-Sleep -Milliseconds 300; $p.Play(); ` +
+    `Start-Sleep -Milliseconds ${waitMs}; $p.Close()`
 
   const escapedInner = inner.replace(/"/g, '\\"')
   return (
@@ -87,7 +87,7 @@ function buildPlayCommand(targets: AudioTargets): { command: string; args: strin
   if (process.platform === 'win32') {
     const source = targets.mp3 ?? targets.ogg
     const safePath = path.resolve(source).replace(/'/g, "''")
-    const waitMs = Math.max(300, targets.durationMs + 200)
+    const waitMs = Math.max(500, targets.durationMs + 1500)
     return {
       command: 'powershell.exe',
       args: [
@@ -95,7 +95,7 @@ function buildPlayCommand(targets: AudioTargets): { command: string; args: strin
         '-WindowStyle',
         'Hidden',
         '-Command',
-        `Add-Type -AssemblyName PresentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([uri]'${safePath}'); $p.Play(); Start-Sleep -Milliseconds ${waitMs}`,
+        `Add-Type -AssemblyName PresentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([uri]'${safePath}'); Start-Sleep -Milliseconds 300; $p.Play(); Start-Sleep -Milliseconds ${waitMs}; $p.Close()`,
       ],
     }
   }
@@ -154,8 +154,8 @@ function generateStopScriptWindows(sounds: StopSoundEntry[]): string {
   const completed = sounds.find((s) => s.status === 'completed')
   const errored = sounds.find((s) => s.status === 'error')
   const maxWait = Math.max(
-    ...sounds.map((s) => s.durationMs + 200),
-    300,
+    ...sounds.map((s) => s.durationMs + 1500),
+    500,
   )
 
   const lines: string[] = [
@@ -185,8 +185,10 @@ function generateStopScriptWindows(sounds: StopSoundEntry[]): string {
     '  Add-Type -AssemblyName PresentationCore *>&1 | Out-Null',
     '  $player = New-Object System.Windows.Media.MediaPlayer',
     '  $player.Open([uri]$mp3)',
+    '  Start-Sleep -Milliseconds 300',
     '  $player.Play()',
     `  Start-Sleep -Milliseconds ${maxWait}`,
+    '  $player.Close()',
     '} catch {}',
     'Write-Output "{}"',
   )
@@ -233,7 +235,7 @@ function generateStopScriptUnix(sounds: StopSoundEntry[], platform: NodeJS.Platf
 function generateSimpleScriptWindows(targets: AudioTargets): string {
   const source = targets.mp3 ?? targets.ogg
   const safePath = path.resolve(source).replace(/'/g, "''")
-  const waitMs = Math.max(300, targets.durationMs + 200)
+  const waitMs = Math.max(500, targets.durationMs + 1500)
 
   return [
     '@($input) | Out-Null',
@@ -241,8 +243,10 @@ function generateSimpleScriptWindows(targets: AudioTargets): string {
     '  Add-Type -AssemblyName PresentationCore *>&1 | Out-Null',
     '  $player = New-Object System.Windows.Media.MediaPlayer',
     `  $player.Open([uri]'${safePath}')`,
+    '  Start-Sleep -Milliseconds 300',
     '  $player.Play()',
     `  Start-Sleep -Milliseconds ${waitMs}`,
+    '  $player.Close()',
     '} catch {}',
     'Write-Output "{}"',
   ].join('\r\n') + '\r\n'

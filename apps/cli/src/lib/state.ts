@@ -18,10 +18,11 @@ export interface InstalledPack {
 
 interface StateFile {
   version: 1
+  activePack: string | null
   packs: InstalledPack[]
 }
 
-const EMPTY_STATE: StateFile = { version: 1, packs: [] }
+const EMPTY_STATE: StateFile = { version: 1, activePack: null, packs: [] }
 
 async function readStateFile(statePath: string): Promise<StateFile> {
   try {
@@ -29,6 +30,7 @@ async function readStateFile(statePath: string): Promise<StateFile> {
     const parsed = JSON.parse(raw) as Partial<StateFile>
     return {
       version: 1,
+      activePack: typeof parsed.activePack === 'string' ? parsed.activePack : null,
       packs: Array.isArray(parsed.packs) ? (parsed.packs as InstalledPack[]) : [],
     }
   } catch (err) {
@@ -72,7 +74,7 @@ export async function upsertInstalled(
   const state = await readStateFile(statePath)
   const filtered = state.packs.filter((p) => p.slug !== entry.slug)
   filtered.push(entry)
-  await writeStateFile(statePath, { version: 1, packs: filtered })
+  await writeStateFile(statePath, { version: 1, activePack: state.activePack, packs: filtered })
 }
 
 export async function removeInstalled(
@@ -83,7 +85,39 @@ export async function removeInstalled(
   const { statePath } = resolveScope(scope, cwd)
   const state = await readStateFile(statePath)
   const filtered = state.packs.filter((p) => p.slug !== slug)
-  await writeStateFile(statePath, { version: 1, packs: filtered })
+  const activePack = state.activePack === slug ? null : state.activePack
+  await writeStateFile(statePath, { version: 1, activePack, packs: filtered })
+}
+
+export async function getActivePack(
+  scope: Scope,
+  cwd: string = process.cwd(),
+): Promise<string | null> {
+  const { statePath } = resolveScope(scope, cwd)
+  const state = await readStateFile(statePath)
+  return state.activePack
+}
+
+export async function setActivePack(
+  slug: string,
+  scope: Scope,
+  cwd: string = process.cwd(),
+): Promise<void> {
+  const { statePath } = resolveScope(scope, cwd)
+  const state = await readStateFile(statePath)
+  if (!state.packs.some((p) => p.slug === slug)) {
+    throw new Error(`Pack "${slug}" is not installed.`)
+  }
+  await writeStateFile(statePath, { version: 1, activePack: slug, packs: state.packs })
+}
+
+export async function clearActivePack(
+  scope: Scope,
+  cwd: string = process.cwd(),
+): Promise<void> {
+  const { statePath } = resolveScope(scope, cwd)
+  const state = await readStateFile(statePath)
+  await writeStateFile(statePath, { version: 1, activePack: null, packs: state.packs })
 }
 
 function isNotFound(err: unknown): boolean {
