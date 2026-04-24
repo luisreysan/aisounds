@@ -17,9 +17,12 @@ export const CURSOR_EVENT_MAP: Partial<Record<SoundEvent, string>> = {
 }
 
 export const CLAUDE_EVENT_MAP: Partial<Record<SoundEvent, string>> = {
-  task_complete: 'PostToolUse',
-  prompt_sent: 'PreToolUse',
-  approval_needed: 'Stop',
+  task_complete: 'Stop',
+  task_failed: 'StopFailure',
+  session_start: 'SessionStart',
+  session_end: 'SessionEnd',
+  prompt_sent: 'UserPromptSubmit',
+  approval_needed: 'PermissionRequest',
   notification: 'Notification',
 }
 

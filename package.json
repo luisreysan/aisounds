@@ -30,5 +30,8 @@
       "sharp",
       "unrs-resolver"
     ]
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.4.2"
   }
 }

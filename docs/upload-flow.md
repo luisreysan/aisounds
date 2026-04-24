@@ -33,7 +33,7 @@ sequenceDiagram
     end
 
     U->>SA: publishPackAction(packId)
-    SA->>DB: require task_complete + task_failed
+    SA->>DB: require task_complete
     SA->>DB: update packs set status=published, published_at=now()
     SA-->>U: redirect /packs/<slug>
 ```
@@ -84,8 +84,9 @@ It enforces, in order:
 
 1. Sign in with GitHub.
 2. Go to `/upload` and fill the metadata form. Click _Create draft_.
-3. Upload at least `task_complete` and `task_failed` (the required events).
-   The row shows a waveform player once the upload succeeds.
+3. Upload at least `task_complete` (the required event).
+   The row shows a waveform player once the upload succeeds. You can remove
+   an uploaded audio from the wizard and choose another file before publish.
 4. Hit _Review_, then _Publish pack_. You should land on `/packs/<slug>`.
 5. Visit `/profile/<your-username>` to see the pack in your grid.
 6. Go back to `/packs` — the new pack appears in the trending list (with a

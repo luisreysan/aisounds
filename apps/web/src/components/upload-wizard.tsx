@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Upload, X } from 'lucide-react'
+import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Trash2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -48,7 +48,7 @@ interface DraftState {
 }
 
 interface SoundState {
-  status: 'idle' | 'uploading' | 'done' | 'error'
+  status: 'idle' | 'uploading' | 'deleting' | 'done' | 'error'
   publicUrlOgg?: string
   durationMs?: number
   sizeBytes?: number
@@ -191,6 +191,33 @@ export function UploadWizard() {
     }
   }
 
+  const deleteSound = async (event: SoundEvent) => {
+    if (!draft) return
+    const previous = sounds[event]
+    if (!previous || previous.status !== 'done') return
+
+    setSounds((prev) => ({ ...prev, [event]: { ...previous, status: 'deleting' } }))
+
+    try {
+      const res = await fetch('/api/upload/sound', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packId: draft.packId, event }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data?.error ?? `Delete failed (${res.status})`)
+      }
+
+      setSounds((prev) => ({ ...prev, [event]: { status: 'idle' } }))
+      toast.success(`Removed "${event}"`)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      setSounds((prev) => ({ ...prev, [event]: { ...previous, status: 'done' } }))
+      toast.error(`Could not remove "${event}"`, { description: message })
+    }
+  }
+
   const publish = () => {
     if (!draft) return
     if (!hasRequiredUploads) {
@@ -264,6 +291,7 @@ export function UploadWizard() {
               events={filteredEvents}
               tools={tools}
               onUpload={uploadSound}
+              onDelete={deleteSound}
               onBack={() => setStep(1)}
               onNext={() => setStep(3)}
               onDiscard={discardDraft}
@@ -509,6 +537,7 @@ function StepSounds(props: {
   events: SoundEvent[]
   tools: string[]
   onUpload: (event: SoundEvent, file: File) => void
+  onDelete: (event: SoundEvent) => void
   onBack: () => void
   onNext: () => void
   onDiscard: () => void
@@ -552,6 +581,7 @@ function StepSounds(props: {
               tools={props.tools}
               state={props.sounds[event]}
               onUpload={(file) => props.onUpload(event, file)}
+              onDelete={() => props.onDelete(event)}
             />
           ))}
         </ul>
@@ -583,11 +613,13 @@ function SoundRow({
   tools,
   state,
   onUpload,
+  onDelete,
 }: {
   event: SoundEvent
   tools: string[]
   state: SoundState | undefined
   onUpload: (file: File) => void
+  onDelete: () => void
 }) {
   const spec = EVENT_SPEC[event]
   const inputId = `file-${event}`
@@ -632,7 +664,19 @@ function SoundRow({
 
       <div className="min-w-0 flex-1">
         {state?.status === 'done' && state.publicUrlOgg ? (
-          <WaveformPlayer src={state.publicUrlOgg} compact />
+          <div className="space-y-2">
+            <WaveformPlayer src={state.publicUrlOgg} compact />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Remove audio
+            </Button>
+          </div>
         ) : (
           <div className="space-y-2">
             {state?.status === 'error' ? (
@@ -643,6 +687,7 @@ function SoundRow({
               className={cn(
                 'flex h-10 cursor-pointer items-center justify-center rounded-md border border-dashed border-border bg-card/30 px-3 text-xs text-muted-foreground transition-colors hover:border-border hover:bg-accent',
                 state?.status === 'uploading' && 'pointer-events-none opacity-60',
+                state?.status === 'deleting' && 'pointer-events-none opacity-60',
               )}
             >
               {state?.status === 'uploading' ? (
@@ -679,6 +724,7 @@ function SoundRow({
 function StatusIcon({ status }: { status: SoundState['status'] }) {
   if (status === 'done') return <CheckCircle2 className="h-4 w-4 text-emerald-500" />
   if (status === 'uploading') return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+  if (status === 'deleting') return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
   if (status === 'error') return <X className="h-4 w-4 text-destructive" />
   return <span className="h-4 w-4 rounded-full border border-border" aria-hidden="true" />
 }

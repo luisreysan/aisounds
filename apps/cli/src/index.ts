@@ -6,6 +6,7 @@ import { install } from './commands/install.js'
 import { list } from './commands/list.js'
 import { preview } from './commands/preview.js'
 import { remove } from './commands/remove.js'
+import { sounds } from './commands/sounds.js'
 import { update } from './commands/update.js'
 import { logger } from './lib/logger.js'
 import { getCliVersion } from './lib/version.js'
@@ -131,6 +132,20 @@ Examples:
 `,
   )
   .action((slug: string, opts: Parameters<typeof activate>[1]) => activate(slug, opts))
+
+program
+  .command('sounds <slug>')
+  .description('enable or disable individual sounds in an installed pack')
+  .option('--project <path>', 'project path for scoped install')
+  .addHelpText(
+    'after',
+    `
+Examples:
+  $ aisounds sounds wav-test
+  $ aisounds sounds wav-test --project ./my-app
+`,
+  )
+  .action((slug: string, opts: Parameters<typeof sounds>[1]) => sounds(slug, opts))
 
 program
   .command('preview <slug>')

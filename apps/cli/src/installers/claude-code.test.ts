@@ -36,6 +36,12 @@ function manifest(): PackManifest {
         duration_ms: 500,
         loop: false,
       },
+      approval_needed: {
+        file: 'sounds/approval_needed.ogg',
+        file_fallback: 'sounds/approval_needed.mp3',
+        duration_ms: 700,
+        loop: false,
+      },
     },
   }
 }
@@ -69,6 +75,9 @@ describe('claudeCodeInstaller', () => {
       hooks: Record<string, unknown[]>
     }
     expect(Object.keys(afterInstall.hooks).length).toBeGreaterThan(0)
+    expect(afterInstall.hooks.PermissionRequest).toBeDefined()
+    const stopMatchers = afterInstall.hooks.Stop as Array<{ hooks?: Array<{ async?: boolean }> }>
+    expect(stopMatchers[0]?.hooks?.[0]?.async).toBe(true)
 
     const removeResult = await claudeCodeInstaller.remove(ctx)
     expect(removeResult.removedCount).toBeGreaterThan(0)

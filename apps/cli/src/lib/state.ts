@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
-import type { SupportedTool } from '@aisounds/core'
+import type { PackManifest, SupportedTool } from '@aisounds/core'
 
 import { allScopePaths, resolveScope, type Scope } from './paths.js'
 
@@ -14,6 +14,7 @@ export interface InstalledPack {
   installedAt: string
   updatedAt: string
   packDir: string
+  disabledEvents?: string[]
 }
 
 interface StateFile {
@@ -118,6 +119,36 @@ export async function clearActivePack(
   const { statePath } = resolveScope(scope, cwd)
   const state = await readStateFile(statePath)
   await writeStateFile(statePath, { version: 1, activePack: null, packs: state.packs })
+}
+
+export async function updateDisabledEvents(
+  slug: string,
+  scope: Scope,
+  disabledEvents: string[],
+  cwd: string = process.cwd(),
+): Promise<void> {
+  const { statePath } = resolveScope(scope, cwd)
+  const state = await readStateFile(statePath)
+  const pack = state.packs.find((p) => p.slug === slug)
+  if (!pack) throw new Error(`Pack "${slug}" is not installed.`)
+  pack.disabledEvents = disabledEvents.length > 0 ? disabledEvents : undefined
+  await writeStateFile(statePath, state)
+}
+
+/**
+ * Returns a shallow copy of the manifest with disabled events removed from
+ * the `sounds` record so installers only write hooks for enabled events.
+ */
+export function filterManifest(
+  manifest: PackManifest,
+  disabledEvents: string[] | undefined,
+): PackManifest {
+  if (!disabledEvents || disabledEvents.length === 0) return manifest
+  const disabled = new Set(disabledEvents)
+  const filtered = Object.fromEntries(
+    Object.entries(manifest.sounds).filter(([event]) => !disabled.has(event)),
+  )
+  return { ...manifest, sounds: filtered as PackManifest['sounds'] }
 }
 
 function isNotFound(err: unknown): boolean {

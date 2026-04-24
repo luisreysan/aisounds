@@ -72,27 +72,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Unsupported mime type: ${mime}` }, { status: 415 })
   }
 
-  const { data: pack, error: packErr } = await supabase
-    .from('packs')
-    .select('id, slug, author_id, status')
-    .eq('id', packId)
-    .maybeSingle()
-
-  if (packErr) {
-    console.error('[upload] pack lookup failed', packErr)
-    return NextResponse.json({ error: 'Pack lookup failed' }, { status: 500 })
-  }
-  if (!pack) {
-    return NextResponse.json({ error: 'Pack not found' }, { status: 404 })
-  }
-  if (pack.author_id !== user.id) {
-    return NextResponse.json({ error: 'You do not own this pack' }, { status: 403 })
-  }
-  if (pack.status !== 'draft') {
-    return NextResponse.json(
-      { error: 'Only draft packs accept uploads. Create a new draft to change sounds.' },
-      { status: 409 },
-    )
+  const pack = await validateDraftPack(supabase, packId, user.id, 'accept uploads')
+  if (!pack.ok) {
+    return NextResponse.json({ error: pack.error }, { status: pack.status })
   }
 
   const inputBuffer = Buffer.from(await file.arrayBuffer())
@@ -156,8 +138,8 @@ export async function POST(req: Request) {
   }
 
   const admin = createAdminClient()
-  const oggPath = `packs/${pack.slug}/sounds/${eventValue}.ogg`
-  const mp3Path = `packs/${pack.slug}/sounds/${eventValue}.mp3`
+  const oggPath = `packs/${pack.data.slug}/sounds/${eventValue}.ogg`
+  const mp3Path = `packs/${pack.data.slug}/sounds/${eventValue}.mp3`
 
   const uploads = await Promise.all([
     admin.storage
@@ -215,10 +197,107 @@ export async function POST(req: Request) {
   })
 }
 
+export async function DELETE(req: Request) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  let body: unknown
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  const packId = typeof (body as { packId?: unknown })?.packId === 'string'
+    ? (body as { packId: string }).packId
+    : null
+  const eventValue = typeof (body as { event?: unknown })?.event === 'string'
+    ? (body as { event: string }).event
+    : null
+
+  if (!packId || !eventValue) {
+    return NextResponse.json({ error: 'packId and event are required' }, { status: 400 })
+  }
+  if (!isSoundEvent(eventValue)) {
+    return NextResponse.json({ error: `Unknown event "${eventValue}"` }, { status: 400 })
+  }
+
+  const pack = await validateDraftPack(supabase, packId, user.id, 'remove sounds')
+  if (!pack.ok) {
+    return NextResponse.json({ error: pack.error }, { status: pack.status })
+  }
+
+  const admin = createAdminClient()
+  const oggPath = `packs/${pack.data.slug}/sounds/${eventValue}.ogg`
+  const mp3Path = `packs/${pack.data.slug}/sounds/${eventValue}.mp3`
+
+  const { error: storageErr } = await admin.storage.from('sounds').remove([oggPath, mp3Path])
+  if (storageErr) {
+    console.error('[upload] storage remove failed', storageErr)
+    return NextResponse.json({ error: 'Storage delete failed' }, { status: 500 })
+  }
+
+  const { error: dbErr } = await admin
+    .from('sounds')
+    .delete()
+    .eq('pack_id', packId)
+    .eq('event', eventValue)
+
+  if (dbErr) {
+    console.error('[upload] db delete failed', dbErr)
+    return NextResponse.json({ error: 'Database delete failed' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true, event: eventValue })
+}
+
 function extractExtension(name: string | undefined | null): string | null {
   if (!name) return null
   const idx = name.lastIndexOf('.')
   if (idx < 0) return null
   const ext = name.slice(idx + 1).toLowerCase()
   return ext || null
+}
+
+type DraftPackValidation =
+  | { ok: true; data: { slug: string } }
+  | { ok: false; status: number; error: string }
+
+async function validateDraftPack(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  packId: string,
+  userId: string,
+  actionLabel: string,
+): Promise<DraftPackValidation> {
+  const { data: pack, error: packErr } = await supabase
+    .from('packs')
+    .select('id, slug, author_id, status')
+    .eq('id', packId)
+    .maybeSingle()
+
+  if (packErr) {
+    console.error('[upload] pack lookup failed', packErr)
+    return { ok: false, status: 500, error: 'Pack lookup failed' }
+  }
+  if (!pack) {
+    return { ok: false, status: 404, error: 'Pack not found' }
+  }
+  if (pack.author_id !== userId) {
+    return { ok: false, status: 403, error: 'You do not own this pack' }
+  }
+  if (pack.status !== 'draft') {
+    return {
+      ok: false,
+      status: 409,
+      error: `Only draft packs can ${actionLabel}. Create a new draft to change sounds.`,
+    }
+  }
+
+  return { ok: true, data: { slug: pack.slug } }
 }

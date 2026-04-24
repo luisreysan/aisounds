@@ -44,7 +44,7 @@ export interface EventSpecEntry {
 
 export const EVENT_SPEC = {
   task_complete: { required: true, maxMs: 10000, loop: false },
-  task_failed: { required: true, maxMs: 10000, loop: false },
+  task_failed: { required: false, maxMs: 10000, loop: false },
   subtask_complete: { required: false, maxMs: 10000, loop: false },
   subtask_failed: { required: false, maxMs: 10000, loop: false },
   prompt_sent: { required: false, maxMs: 10000, loop: false },

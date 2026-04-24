@@ -10,6 +10,7 @@ import type { Installer, InstallerContext } from './types.js'
 type ClaudeHookEntry = {
   type: 'command'
   command: string
+  async: true
   _aisounds: { pack: string; event: string; version?: string }
 }
 
@@ -68,6 +69,7 @@ export const claudeCodeInstaller: Installer = {
       const hookEntry: ClaudeHookEntry = {
         type: 'command',
         command: buildHookCommand({ ogg, mp3, durationMs: sound.duration_ms }),
+        async: true,
         _aisounds: { pack: ctx.slug, event: eventKey, version: '1' },
       }
 

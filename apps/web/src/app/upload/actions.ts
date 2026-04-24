@@ -115,8 +115,8 @@ export type PublishResult =
   | { ok: false; error: string }
 
 /**
- * Marks the draft pack as published. Requires at least the `task_complete` +
- * `task_failed` sounds (the AISE required set) to exist.
+ * Marks the draft pack as published. Requires at least the `task_complete`
+ * sound (the AISE required set) to exist.
  */
 export async function publishPackAction(packId: string): Promise<PublishResult> {
   const supabase = await createClient()
@@ -144,7 +144,7 @@ export async function publishPackAction(packId: string): Promise<PublishResult> 
   if (soundsErr) return { ok: false, error: 'Could not read sounds' }
 
   const events = new Set((sounds ?? []).map((s) => s.event))
-  const missing = ['task_complete', 'task_failed'].filter((e) => !events.has(e))
+  const missing = ['task_complete'].filter((e) => !events.has(e))
   if (missing.length > 0) {
     return {
       ok: false,

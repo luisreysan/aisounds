@@ -6,7 +6,7 @@ import { parseManifest, type SupportedTool } from '@aisounds/core'
 import { getInstaller } from '../installers/index.js'
 import { logger } from '../lib/logger.js'
 import type { Scope } from '../lib/paths.js'
-import { findInstalled, getActivePack, listInstalled, setActivePack } from '../lib/state.js'
+import { filterManifest, findInstalled, getActivePack, listInstalled, setActivePack } from '../lib/state.js'
 
 export interface ActivateOptions {
   global?: boolean
@@ -60,13 +60,15 @@ export async function activate(slug: string, opts: ActivateOptions = {}): Promis
     return
   }
 
+  const effectiveManifest = filterManifest(targetManifest, target.disabledEvents)
+
   for (const tool of target.tools) {
     const installer = getInstaller(tool)
     try {
       const result = await installer.install({
         slug,
         packDir: target.packDir,
-        manifest: targetManifest,
+        manifest: effectiveManifest,
         scope,
         cwd,
       })
