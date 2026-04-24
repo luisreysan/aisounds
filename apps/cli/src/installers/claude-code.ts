@@ -59,7 +59,7 @@ export const claudeCodeInstaller: Installer = {
       const existing = Array.isArray(hooks[claudeEvent])
         ? (hooks[claudeEvent] as unknown[])
         : []
-      const preserved = existing.filter((entry) => !isAisoundsEntry(entry, ctx.slug))
+      const preserved = existing.filter((entry) => !isAisoundsEntry(entry))
 
       const ogg = path.join(ctx.packDir, sound.file)
       const mp3 = sound.file_fallback

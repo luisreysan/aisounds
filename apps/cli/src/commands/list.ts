@@ -4,12 +4,13 @@ import { logger } from '../lib/logger.js'
 import { getActivePack, listInstalled } from '../lib/state.js'
 
 export interface ListOptions {
+  global?: boolean
   project?: string
 }
 
 export async function list(opts: ListOptions = {}): Promise<void> {
   const cwd = opts.project ?? process.cwd()
-  const installed = await listInstalled(cwd)
+  const installed = (await listInstalled(cwd)).filter((pack) => (opts.global ? pack.scope === 'global' : true))
 
   if (installed.length === 0) {
     logger.info('No packs installed.')

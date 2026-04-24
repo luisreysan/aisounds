@@ -5,17 +5,20 @@ import path from 'node:path'
 
 import { getInstaller, isSupportedTool } from '../installers/index.js'
 import { logger } from '../lib/logger.js'
-import { findInstalled, getActivePack, removeInstalled } from '../lib/state.js'
+import { findInstalled, getActivePack, listInstalled, removeInstalled } from '../lib/state.js'
 import type { Scope } from '../lib/paths.js'
 
 export interface RemoveOptions {
   tool?: string
+  global?: boolean
   project?: string
 }
 
 export async function remove(slug: string, opts: RemoveOptions): Promise<void> {
   const cwd = opts.project ?? process.cwd()
-  const installed = await findInstalled(slug, cwd)
+  const installed = opts.global
+    ? (await listInstalled(cwd)).find((pack) => pack.slug === slug && pack.scope === 'global') ?? null
+    : await findInstalled(slug, cwd)
   if (!installed) {
     logger.error(`Pack "${slug}" is not installed in this project or globally.`)
     process.exitCode = 1

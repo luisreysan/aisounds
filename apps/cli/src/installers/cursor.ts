@@ -93,7 +93,7 @@ export const cursorInstaller: Installer = {
 
       const scriptCmd = buildScriptCommand(ctx, scriptsDir, scriptName)
       const existing = config.hooks['stop'] ?? []
-      const preserved = existing.filter((h) => !isAisoundsEntry(h, ctx.slug))
+      const preserved = existing.filter((h) => !isAisoundsEntry(h))
       const entry: CursorHookEntry = {
         command: scriptCmd,
         _aisounds: { pack: ctx.slug, event: 'stop', version: '1' },
@@ -112,7 +112,7 @@ export const cursorInstaller: Installer = {
 
       const scriptCmd = buildScriptCommand(ctx, scriptsDir, scriptName)
       const existing = config.hooks[cursorEvent] ?? []
-      const preserved = existing.filter((h) => !isAisoundsEntry(h, ctx.slug))
+      const preserved = existing.filter((h) => !isAisoundsEntry(h))
       const entry: CursorHookEntry = {
         command: scriptCmd,
         _aisounds: { pack: ctx.slug, event: aisEvent, version: '1' },

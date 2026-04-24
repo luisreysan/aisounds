@@ -4,18 +4,21 @@ import path from 'node:path'
 import { parseManifest, type SupportedTool } from '@aisounds/core'
 
 import { getInstaller } from '../installers/index.js'
-import { isAisoundsEntry, readJsonConfig, writeJsonConfig } from '../installers/config-io.js'
 import { logger } from '../lib/logger.js'
-import { resolveScope, type Scope } from '../lib/paths.js'
+import type { Scope } from '../lib/paths.js'
 import { findInstalled, getActivePack, listInstalled, setActivePack } from '../lib/state.js'
 
 export interface ActivateOptions {
+  global?: boolean
   project?: string
 }
 
 export async function activate(slug: string, opts: ActivateOptions = {}): Promise<void> {
   const cwd = opts.project ?? process.cwd()
-  const target = await findInstalled(slug, cwd)
+  const allPacks = await listInstalled(cwd)
+  const target = opts.global
+    ? allPacks.find((pack) => pack.slug === slug && pack.scope === 'global') ?? null
+    : await findInstalled(slug, cwd)
   if (!target) {
     logger.error(`Pack "${slug}" is not installed. Run 'aisounds install ${slug}' first.`)
     process.exitCode = 1
@@ -29,7 +32,6 @@ export async function activate(slug: string, opts: ActivateOptions = {}): Promis
     return
   }
 
-  const allPacks = await listInstalled(cwd)
   const sameScopePacks = allPacks.filter((p) => p.scope === scope)
 
   for (const pack of sameScopePacks) {

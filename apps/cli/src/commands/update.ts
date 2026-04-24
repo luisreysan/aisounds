@@ -4,6 +4,7 @@ import { listInstalled } from '../lib/state.js'
 import { install } from './install.js'
 
 export interface UpdateOptions {
+  global?: boolean
   project?: string
 }
 
@@ -15,7 +16,7 @@ export interface UpdateOptions {
  */
 export async function update(opts: UpdateOptions = {}): Promise<void> {
   const cwd = opts.project ?? process.cwd()
-  const installed = await listInstalled(cwd)
+  const installed = (await listInstalled(cwd)).filter((pack) => (opts.global ? pack.scope === 'global' : true))
 
   if (installed.length === 0) {
     logger.info('Nothing to update — no packs installed.')
