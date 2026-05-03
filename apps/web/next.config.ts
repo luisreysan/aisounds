@@ -1,5 +1,6 @@
 import createMDX from '@next/mdx'
 import type { NextConfig } from 'next'
+import remarkGfm from 'remark-gfm'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -16,6 +17,11 @@ const nextConfig: NextConfig = {
   },
 }
 
-const withMDX = createMDX({})
+const withMDX = createMDX({
+  options: {
+    /* GitHub-flavored Markdown: pipe tables, strikethrough, autolinks, etc. */
+    remarkPlugins: [remarkGfm],
+  },
+})
 
 export default withMDX(nextConfig)

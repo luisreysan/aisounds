@@ -17,29 +17,58 @@ Only `task_complete` is **required** in a pack — every other event is optional
 
 ## All AISE events
 
-| Event | Required | Group | Description |
-|-------|:--------:|-------|-------------|
-| `task_complete` | ✓ | Agent | Agent finished the current task successfully |
-| `task_failed` |  | Agent | Agent stopped with an error or was aborted |
-| `subtask_complete` |  | Agent | A subtask within a larger task finished |
-| `subtask_failed` |  | Agent | A subtask within a larger task failed |
-| `prompt_sent` |  | User | The user submitted a prompt |
-| `approval_needed` |  | User | The agent is requesting user permission |
-| `approval_granted` |  | User | The user approved a request |
-| `approval_denied` |  | User | The user denied a request |
-| `thinking_start` |  | Processing | The agent began reasoning |
-| `thinking_end` |  | Processing | The agent finished reasoning |
-| `tool_called` |  | Processing | The agent invoked a tool |
-| `tool_complete` |  | Processing | A tool invocation finished |
-| `file_created` |  | Files | A file was created |
-| `file_modified` |  | Files | A file was modified |
-| `file_deleted` |  | Files | A file was deleted |
-| `session_start` |  | Session | A new agent session started |
-| `session_end` |  | Session | An agent session ended |
-| `session_error` |  | Session | An agent session crashed |
-| `notification` |  | Special | A generic notification |
-| `warning` |  | Special | A non-fatal warning |
-| `celebration` |  | Special | A milestone or celebration |
+Events are grouped by category. The **Required** column shows whether a pack must include a sound for that event (only `task_complete` is mandatory).
+
+### Agent
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `task_complete` | Yes | Agent finished the current task successfully |
+| `task_failed` |  | Agent stopped with an error or was aborted |
+| `subtask_complete` |  | A subtask within a larger task finished |
+| `subtask_failed` |  | A subtask within a larger task failed |
+
+### User interaction
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `prompt_sent` |  | The user submitted a prompt |
+| `approval_needed` |  | The agent is requesting user permission |
+| `approval_granted` |  | The user approved a request |
+| `approval_denied` |  | The user denied a request |
+
+### Processing
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `thinking_start` |  | The agent began reasoning |
+| `thinking_end` |  | The agent finished reasoning |
+| `tool_called` |  | The agent invoked a tool |
+| `tool_complete` |  | A tool invocation finished |
+
+### File system
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `file_created` |  | A file was created |
+| `file_modified` |  | A file was modified |
+| `file_deleted` |  | A file was deleted |
+
+### Session
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `session_start` |  | A new agent session started |
+| `session_end` |  | An agent session ended |
+| `session_error` |  | An agent session crashed |
+
+### Special
+
+| Event | Required | Description |
+| :---- | :--------: | :---------- |
+| `notification` |  | A generic notification |
+| `warning` |  | A non-fatal warning |
+| `celebration` |  | A milestone or celebration |
 
 All sounds must be **≤ 10 seconds** long. The `loop` flag is forbidden except optionally on `thinking_start`.
 
@@ -52,19 +81,19 @@ Not every tool exposes every AISE event. The CLI only writes hooks for the event
 Hooks live in `.cursor/hooks.json` (project) or `~/.cursor/hooks.json` (global). Cursor multiplexes both task results into the single `stop` hook with a `status` field.
 
 | AISE event | Cursor hook |
-|------------|-------------|
-| `task_complete` | `stop` (when `status=completed`) |
-| `task_failed` | `stop` (when `status=error` or `status=aborted`) |
+| :--------- | :---------- |
+| `task_complete` | `stop` when `status=completed` |
+| `task_failed` | `stop` when `status=error` or `status=aborted` |
 | `prompt_sent` | `beforeSubmitPrompt` |
 | `tool_called` | `preToolUse` |
 | `session_start` | `sessionStart` |
 
 ### Claude Code
 
-Hooks live under `hooks` in `.claude/settings.json` (project) or `~/.claude/settings.json` (global). Claude Code distinguishes success and failure into two separate hooks.
+Hooks live under `hooks` in `.claude/settings.json` (project) or `~/.claude/settings.json` (global). Claude Code uses separate hooks for success vs failure.
 
 | AISE event | Claude Code hook |
-|------------|------------------|
+| :--------- | :--------------- |
 | `task_complete` | `Stop` |
 | `task_failed` | `StopFailure` |
 | `session_start` | `SessionStart` |
@@ -76,7 +105,7 @@ Hooks live under `hooks` in `.claude/settings.json` (project) or `~/.claude/sett
 ### VS Code (planned)
 
 | AISE event | VS Code hook |
-|------------|--------------|
+| :--------- | :----------- |
 | `task_complete` | `onChatResponseComplete` |
 | `prompt_sent` | `onChatRequestSent` |
 | `tool_called` | `onToolInvocation` |
