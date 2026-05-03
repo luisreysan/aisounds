@@ -51,6 +51,20 @@ That's what powers `aisounds list` and `aisounds update`.
 | ------------------ | --------------------- | --------------------------------------------- |
 | `AISOUNDS_API_URL` | `https://aisounds.dev` | Base URL used to fetch bundles and metadata. |
 
+## Linux, macOS, and WSL
+
+The CLI detects the OS (`mac`, `windows`, or `linux` for bundles on Linux—including **WSL**). Downloads and installs are the same Unix flow as on a bare-metal Linux laptop.
+
+For **audio playback**, hooks try (in order) **PulseAudio** `paplay`, **FFmpeg** `ffplay`, then ALSA `aplay`. On Debian/Ubuntu you usually want at least:
+
+```bash
+sudo apt update && sudo apt install -y pulseaudio-utils ffmpeg
+```
+
+On **macOS**, hooks use **`afplay`**.
+
+Under **WSL2**, audio is usually forwarded to Windows speakers (or you run a PulseAudio server in WSL). If you hear nothing, run `aisounds preview <slug>` and separately test `paplay /usr/share/sounds/alsa/Front_Center.wav` (or any short WAV) — if that fails too, fix WSL/Linux audio before debugging the CLI.
+
 ## Development
 
 ```bash

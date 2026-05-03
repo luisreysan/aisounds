@@ -3,7 +3,9 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  bashSingleQuotedPath,
   buildHookCommand,
+  buildPlayCommand,
   buildWindowsMp3HookForAsyncHost,
   generateSimpleScript,
   generateStopScript,
@@ -63,6 +65,33 @@ describe('buildHookCommand', () => {
     expect(cmd).toContain('SoundPlayer')
     expect(cmd).toContain('task_complete.ogg')
     expect(cmd).not.toContain('PresentationCore')
+  })
+})
+
+describe('bashSingleQuotedPath', () => {
+  it('wraps paths and escapes single quotes for bash', () => {
+    expect(bashSingleQuotedPath('/tmp/x.ogg')).toBe(`'/tmp/x.ogg'`)
+    expect(bashSingleQuotedPath("/tmp/x's.ogg")).toBe(`'/tmp/x'\\''s.ogg'`)
+  })
+})
+
+describe('buildPlayCommand', () => {
+  afterEach(() => {
+    Object.defineProperty(process, 'platform', { value: originalPlatform, configurable: true })
+  })
+
+  it('uses bash with paplay/ffplay/aplay chain on Linux like hooks', () => {
+    Object.defineProperty(process, 'platform', { value: 'linux', configurable: true })
+    const { command, args } = buildPlayCommand({
+      ogg: '/pack/sounds/ping.ogg',
+      durationMs: 400,
+    })
+    expect(command).toBe('bash')
+    expect(args[0]).toBe('-c')
+    expect(args[1]).toContain('paplay')
+    expect(args[1]).toContain('ffplay')
+    expect(args[1]).toContain('aplay')
+    expect(args[1]).toMatch(/ping\.ogg/)
   })
 })
 

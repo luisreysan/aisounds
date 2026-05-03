@@ -98,7 +98,16 @@ export function buildWindowsMp3HookForAsyncHost(mp3AbsPath: string, durationMs: 
   return `powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`
 }
 
-function buildPlayCommand(targets: AudioTargets): { command: string; args: string[] } {
+/** Shell-safe single-quote for `bash -c` (escaped internal `'` → `'\''`). */
+export function bashSingleQuotedPath(absPath: string): string {
+  return `'${absPath.replace(/'/g, `'\\''`)}'`
+}
+
+/**
+ * Spawn args used by {@link playFile}. On Linux/other Unix hooks use paplay/ffplay/aplay;
+ * preview now uses the same chain so WSL/Linux work without FFmpeg when Pulse is available.
+ */
+export function buildPlayCommand(targets: AudioTargets): { command: string; args: string[] } {
   if (process.platform === 'darwin') {
     return { command: 'afplay', args: [path.resolve(targets.ogg)] }
   }
@@ -117,9 +126,11 @@ function buildPlayCommand(targets: AudioTargets): { command: string; args: strin
       ],
     }
   }
+  const ogg = bashSingleQuotedPath(path.resolve(targets.ogg))
+  const compound = `(command -v paplay >/dev/null && paplay ${ogg} || command -v ffplay >/dev/null && ffplay -nodisp -autoexit -loglevel quiet ${ogg} || aplay ${ogg})`
   return {
-    command: 'ffplay',
-    args: ['-nodisp', '-autoexit', '-loglevel', 'quiet', path.resolve(targets.ogg)],
+    command: 'bash',
+    args: ['-c', compound],
   }
 }
 
