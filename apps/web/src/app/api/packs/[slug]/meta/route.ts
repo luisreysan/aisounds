@@ -32,7 +32,6 @@ export async function GET(
         name: pack.name,
         description: pack.description,
         license: pack.license,
-        cover_color: pack.cover_color,
         aise_version: pack.aise_version,
         author: {
           username: pack.author_username,

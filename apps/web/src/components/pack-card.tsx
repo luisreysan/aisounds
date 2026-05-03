@@ -5,11 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { formatNumber } from '@/lib/format'
+import { generateGradient } from '@/lib/gradient'
 import type { PackCardRow } from '@/lib/supabase/types'
 
 export function PackCard({ pack }: { pack: PackCardRow }) {
-  const coverColor = pack.cover_color || '#6366f1'
-  const gradient = `radial-gradient(circle at 25% 15%, ${coverColor}, ${shade(coverColor, -0.35)})`
+  const gradient = generateGradient(pack.slug)
 
   return (
     <Card className="group relative overflow-hidden border-border/60 transition-colors hover:border-border">
@@ -75,16 +75,3 @@ export function PackCard({ pack }: { pack: PackCardRow }) {
   )
 }
 
-/**
- * Small helper to derive a darker/lighter variant of the pack's cover color so
- * the gradient has some depth. Not color-science perfect but fine for the UI.
- */
-function shade(hex: string, amount: number): string {
-  const normalized = hex.replace('#', '')
-  if (normalized.length !== 6) return hex
-  const num = parseInt(normalized, 16)
-  const r = Math.max(0, Math.min(255, Math.round(((num >> 16) & 0xff) * (1 + amount))))
-  const g = Math.max(0, Math.min(255, Math.round(((num >> 8) & 0xff) * (1 + amount))))
-  const b = Math.max(0, Math.min(255, Math.round((num & 0xff) * (1 + amount))))
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
-}

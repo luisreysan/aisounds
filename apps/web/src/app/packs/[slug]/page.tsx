@@ -11,6 +11,7 @@ import { InstallSnippet } from '@/components/install-snippet'
 import { PackOwnerControls } from '@/components/pack-owner-controls'
 import { VoteButton } from '@/components/vote-button'
 import { WaveformPlayer } from '@/components/waveform-player'
+import { generateGradient } from '@/lib/gradient'
 import { getPackBySlug, hasUserVoted } from '@/lib/packs'
 import { getSessionUser } from '@/lib/auth'
 import { TOOL_OPTIONS } from '@/lib/catalog'
@@ -38,8 +39,7 @@ export default async function PackDetailPage({
   if (!detail) notFound()
 
   const { pack, sounds } = detail
-  const coverColor = pack.cover_color || '#6366f1'
-  const gradient = `radial-gradient(ellipse at 20% 0%, ${coverColor}, ${shade(coverColor, -0.45)})`
+  const gradient = generateGradient(pack.slug)
 
   const [user, initialVoted] = await Promise.all([
     getSessionUser(),
@@ -216,7 +216,7 @@ export default async function PackDetailPage({
                     <WaveformPlayer
                       src={sound.public_url_ogg}
                       durationMs={sound.duration_ms}
-                      color={coverColor}
+                      color="#6366f1"
                     />
                   </div>
                 </Card>
@@ -261,12 +261,3 @@ function MetaCard({
   )
 }
 
-function shade(hex: string, amount: number): string {
-  const normalized = hex.replace('#', '')
-  if (normalized.length !== 6) return hex
-  const num = parseInt(normalized, 16)
-  const r = Math.max(0, Math.min(255, Math.round(((num >> 16) & 0xff) * (1 + amount))))
-  const g = Math.max(0, Math.min(255, Math.round(((num >> 8) & 0xff) * (1 + amount))))
-  const b = Math.max(0, Math.min(255, Math.round((num & 0xff) * (1 + amount))))
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
-}

@@ -38,6 +38,7 @@ import {
 } from '@/app/upload/actions'
 import { LICENSE_OPTIONS, TAG_OPTIONS, TOOL_OPTIONS } from '@/lib/catalog'
 import { formatDurationMs, formatBytes, slugify } from '@/lib/format'
+import { generateGradient } from '@/lib/gradient'
 import { cn } from '@/lib/utils'
 
 type Step = 1 | 2 | 3
@@ -65,7 +66,6 @@ export function UploadWizard() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [license, setLicense] = useState<'CC0' | 'CC-BY' | 'CC-BY-SA' | 'MIT'>('CC0')
-  const [coverColor, setCoverColor] = useState('#6366f1')
   const [tags, setTags] = useState<string[]>([])
   const [tools, setTools] = useState<string[]>([])
 
@@ -133,7 +133,6 @@ export function UploadWizard() {
         name: name.trim(),
         description: description.trim() || null,
         license,
-        coverColor,
         tags,
         tools,
         preferredSlug: previewSlug !== '—' ? previewSlug : undefined,
@@ -271,8 +270,6 @@ export function UploadWizard() {
               setDescription={setDescription}
               license={license}
               setLicense={setLicense}
-              coverColor={coverColor}
-              setCoverColor={setCoverColor}
               tags={tags}
               setTags={setTags}
               tools={tools}
@@ -304,7 +301,6 @@ export function UploadWizard() {
               description={description}
               slug={draft.slug}
               license={license}
-              coverColor={coverColor}
               tags={tags}
               tools={tools}
               sounds={sounds}
@@ -360,8 +356,6 @@ function StepMetadata(props: {
   setDescription: (v: string) => void
   license: 'CC0' | 'CC-BY' | 'CC-BY-SA' | 'MIT'
   setLicense: (v: 'CC0' | 'CC-BY' | 'CC-BY-SA' | 'MIT') => void
-  coverColor: string
-  setCoverColor: (v: string) => void
   tags: string[]
   setTags: (v: string[]) => void
   tools: string[]
@@ -431,42 +425,24 @@ function StepMetadata(props: {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>License</Label>
-            <Select
-              value={props.license}
-              onValueChange={(v) => props.setLicense(v as typeof props.license)}
-              disabled={!!props.lockedSlug}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {LICENSE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="cover">Cover color</Label>
-            <div className="flex items-center gap-3">
-              <input
-                id="cover"
-                type="color"
-                value={props.coverColor}
-                onChange={(e) => props.setCoverColor(e.target.value)}
-                disabled={!!props.lockedSlug}
-                className="h-9 w-12 cursor-pointer rounded-md border border-input bg-transparent"
-                aria-label="Cover color picker"
-              />
-              <code className="font-mono text-sm">{props.coverColor}</code>
-            </div>
-          </div>
+        <div className="space-y-1.5">
+          <Label>License</Label>
+          <Select
+            value={props.license}
+            onValueChange={(v) => props.setLicense(v as typeof props.license)}
+            disabled={!!props.lockedSlug}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LICENSE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
@@ -734,7 +710,6 @@ function StepReview(props: {
   description: string
   slug: string
   license: string
-  coverColor: string
   tags: string[]
   tools: string[]
   sounds: Record<string, SoundState>
@@ -754,9 +729,7 @@ function StepReview(props: {
       <CardContent className="flex flex-col gap-5">
         <div
           className="rounded-lg p-5 text-white"
-          style={{
-            background: `radial-gradient(circle at 25% 15%, ${props.coverColor}, ${props.coverColor}55)`,
-          }}
+          style={{ background: generateGradient(props.slug) }}
         >
           <div className="text-xs uppercase tracking-wider opacity-80">/packs/{props.slug}</div>
           <div className="mt-1 text-2xl font-semibold">{props.name}</div>

@@ -8,14 +8,12 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { slugify } from '@/lib/format'
 
-const COVER_COLOR_RE = /^#[0-9a-fA-F]{6}$/u
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,79}$/u
 
 const DraftSchema = z.object({
   name: z.string().min(2).max(80),
   description: z.string().max(400).optional().nullable(),
   license: z.enum(['CC0', 'CC-BY', 'CC-BY-SA', 'MIT']).default('CC0'),
-  coverColor: z.string().regex(COVER_COLOR_RE).default('#6366f1'),
   tags: z.array(z.string().min(1).max(40)).max(5).default([]),
   tools: z.array(z.string().min(1).max(40)).max(10).default([]),
 })
@@ -63,7 +61,6 @@ export async function createPackDraftAction(input: DraftInputWithPreferredSlug):
       author_id: user.id,
       status: 'draft',
       license: parsed.data.license,
-      cover_color: parsed.data.coverColor,
     })
     .select('id, slug')
     .single()

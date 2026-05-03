@@ -57,7 +57,6 @@ interface PackTable {
     author_id: string
     status: PackStatus
     license: License
-    cover_color: string
     aise_version: string
     download_count: number
     vote_count: number
@@ -74,7 +73,6 @@ interface PackTable {
     author_id: string
     status?: PackStatus
     license?: License
-    cover_color?: string
     aise_version?: string
     download_count?: number
     vote_count?: number
@@ -197,7 +195,6 @@ interface PackCardsView {
     name: string
     description: string | null
     license: License
-    cover_color: string
     aise_version: string
     download_count: number
     vote_count: number
