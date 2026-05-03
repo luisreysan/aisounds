@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { CLAUDE_EVENT_MAP, type SoundEvent } from '@aisounds/core'
 
-import { buildHookCommand } from '../lib/audio.js'
+import { buildHookCommand, buildWindowsMp3HookForAsyncHost } from '../lib/audio.js'
 import { isAisoundsEntry, readJsonConfig, writeJsonConfig } from './config-io.js'
 import type { Installer, InstallerContext } from './types.js'
 
@@ -66,9 +66,13 @@ export const claudeCodeInstaller: Installer = {
       const mp3 = sound.file_fallback
         ? path.join(ctx.packDir, sound.file_fallback)
         : undefined
+      const command =
+        process.platform === 'win32' && mp3
+          ? buildWindowsMp3HookForAsyncHost(mp3, sound.duration_ms)
+          : buildHookCommand({ ogg, mp3, durationMs: sound.duration_ms })
       const hookEntry: ClaudeHookEntry = {
         type: 'command',
-        command: buildHookCommand({ ogg, mp3, durationMs: sound.duration_ms }),
+        command,
         async: true,
         _aisounds: { pack: ctx.slug, event: eventKey, version: '1' },
       }

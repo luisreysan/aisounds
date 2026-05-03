@@ -1,0 +1,46 @@
+import { CopyPageButton } from '@/components/docs/copy-page-button'
+
+export const metadata = {
+  title: 'Docs · AI Sounds',
+  description:
+    'Open-source platform for adding sound notifications to AI coding tools like Cursor, Claude Code, and VS Code.',
+}
+
+<div className="not-prose mb-6 flex justify-end">
+  <CopyPageButton source="/docs-md/index.md" />
+</div>
+
+# AI Sounds documentation
+
+> Open-source platform for adding sound notifications to AI coding tools like Cursor, Claude Code, and VS Code.
+
+AI Sounds (AISE) lets developers install **sound packs** that play audio feedback when AI agents complete tasks, fail, send prompts, or trigger other lifecycle events. Packs are installed and managed through a small CLI, which configures the right hooks in each supported tool automatically.
+
+## What you get
+
+- A growing catalogue of community-uploaded sound packs.
+- A single CLI (`aisounds`) that installs packs into Cursor, Claude Code, and more.
+- A canonical event vocabulary (**AISE**) so the same pack works across tools.
+- Per-pack control: activate one pack at a time, enable or disable individual events.
+
+## Where to start
+
+- **New here?** Read [Getting started](/docs/getting-started) to install your first pack.
+- **Confused by tools vs scopes?** Jump to [Concepts: tools and scopes](/docs/concepts).
+- **Looking for a command?** See the [CLI reference](/docs/cli).
+- **Building a pack or integrating a tool?** Check the [AISE events reference](/docs/events).
+- **AI agent / LLM?** See [For AI agents](/docs/for-llms) and [`/llms.txt`](/llms.txt).
+
+## Supported tools
+
+| Tool | Status | Hook config |
+|------|--------|-------------|
+| Cursor | Stable | `.cursor/hooks.json` |
+| Claude Code | Stable | `.claude/settings.json` |
+| VS Code | Planned | `settings.json` |
+| Windsurf | Planned | TBD |
+| Aider | Planned | TBD |
+
+## License
+
+The platform code is open source. Each pack carries its own license (CC0, CC-BY, CC-BY-SA, or MIT) declared in its manifest.

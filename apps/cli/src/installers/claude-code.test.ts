@@ -76,8 +76,13 @@ describe('claudeCodeInstaller', () => {
     }
     expect(Object.keys(afterInstall.hooks).length).toBeGreaterThan(0)
     expect(afterInstall.hooks.PermissionRequest).toBeDefined()
-    const stopMatchers = afterInstall.hooks.Stop as Array<{ hooks?: Array<{ async?: boolean }> }>
+    const stopMatchers = afterInstall.hooks.Stop as Array<{
+      hooks?: Array<{ async?: boolean; command?: string }>
+    }>
     expect(stopMatchers[0]?.hooks?.[0]?.async).toBe(true)
+    if (process.platform === 'win32') {
+      expect(stopMatchers[0]?.hooks?.[0]?.command).toContain('-EncodedCommand')
+    }
 
     const removeResult = await claudeCodeInstaller.remove(ctx)
     expect(removeResult.removedCount).toBeGreaterThan(0)

@@ -1,0 +1,122 @@
+# CLI reference
+
+The `aisounds` CLI is published on npm. You can run it directly with `npx`:
+
+```bash
+npx aisounds@latest <command> [options]
+```
+
+## Common flags
+
+These are accepted by most commands:
+
+| Flag | Description |
+|------|-------------|
+| `--global` | Operate on **global scope** instead of project scope. |
+| `--project <path>` | Operate on a specific project path instead of the current directory. |
+| `--tool <tool>` | Target a specific tool: `cursor`, `claude-code`, `vscode` (planned), `windsurf` (planned), `aider` (planned). |
+
+See Concepts: tools and scopes for the full meaning of these dimensions.
+
+---
+
+## install
+
+Download a pack from aisounds.dev and configure hooks for the chosen tool.
+
+```bash
+aisounds install <slug> [--tool <tool>] [--global] [--project <path>]
+```
+
+If no pack is currently active in the target scope, the newly installed pack is **automatically activated**. Otherwise it is downloaded but not enabled — run `activate` to switch.
+
+**Examples**
+
+```bash
+npx aisounds@latest install retro-beeps --tool cursor
+npx aisounds@latest install retro-beeps --tool claude-code --global
+npx aisounds@latest install retro-beeps --tool cursor --project ./my-app
+```
+
+## activate
+
+Set the **active pack** in a scope. The CLI removes hooks for any other pack in that same scope and writes hooks only for the chosen pack. Only one pack is active per scope.
+
+```bash
+aisounds activate <slug> [--global] [--project <path>]
+```
+
+**Examples**
+
+```bash
+npx aisounds@latest activate retro-beeps
+npx aisounds@latest activate retro-beeps --global
+```
+
+## remove
+
+Remove an installed pack and revert its hook entries from the tool config(s).
+
+```bash
+aisounds remove <slug> [--tool <tool>] [--global] [--project <path>]
+```
+
+By default, hooks are removed from **every tool** the pack was installed for. Pass `--tool` to remove from a single tool only.
+
+**Examples**
+
+```bash
+npx aisounds@latest remove retro-beeps
+npx aisounds@latest remove retro-beeps --tool cursor
+```
+
+## list
+
+List all installed packs across project and global scopes. The active pack in each scope is marked with a `*`.
+
+```bash
+aisounds list [--global] [--project <path>]
+```
+
+## info
+
+Show details for a pack from aisounds.dev (works without installing).
+
+```bash
+aisounds info <slug>
+```
+
+## sounds
+
+Open an interactive checklist to enable or disable individual events for an installed pack. Useful when you want a pack but only some of its sounds.
+
+```bash
+aisounds sounds <slug> [--project <path>]
+```
+
+If the pack is the active one, hooks are regenerated immediately based on the new selection.
+
+## preview
+
+Play every sound in a pack from the terminal, in order. Useful for auditioning packs before installing.
+
+```bash
+aisounds preview <slug>
+```
+
+## update
+
+Re-install packs whose upstream version has changed.
+
+```bash
+aisounds update [--global] [--project <path>]
+```
+
+## State files
+
+The CLI stores its bookkeeping in JSON files. You normally don't edit these by hand, but they're useful for debugging:
+
+- **Project**: `<project>/.aisounds/installed.json`
+- **Global**: `~/.aisounds/installed.json`
+
+Each file tracks the installed pack list, the active pack slug, and per-pack disabled events.

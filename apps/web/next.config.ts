@@ -1,11 +1,11 @@
+import createMDX from '@next/mdx'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@aisounds/core'],
-  experimental: {
-    typedRoutes: true,
-  },
+  pageExtensions: ['ts', 'tsx', 'mdx'],
+  typedRoutes: true,
   // ffmpeg-static and fluent-ffmpeg must not be bundled — they read binaries at runtime
   serverExternalPackages: ['fluent-ffmpeg', 'ffmpeg-static'],
   images: {
@@ -16,4 +16,6 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+const withMDX = createMDX({})
+
+export default withMDX(nextConfig)

@@ -80,6 +80,24 @@ function buildWindowsMp3Hook(mp3AbsPath: string, durationMs: number): string {
   )
 }
 
+/**
+ * Windows MP3 playback for hosts that invoke hooks with `async: true` (e.g. Claude Code).
+ * Nested `Start-Process` in {@link buildWindowsMp3Hook} can exit before the child process
+ * plays audio. This runs playback in a single PowerShell process using `-EncodedCommand`
+ * so quoting survives JSON and cmd.exe.
+ */
+export function buildWindowsMp3HookForAsyncHost(mp3AbsPath: string, durationMs: number): string {
+  const safePath = path.resolve(mp3AbsPath).replace(/'/g, "''")
+  const waitMs = Math.max(500, durationMs + 1500)
+  const script =
+    `Add-Type -AssemblyName PresentationCore *>&1 | Out-Null; ` +
+    `$p = New-Object System.Windows.Media.MediaPlayer; ` +
+    `$p.Open([uri]'${safePath}'); Start-Sleep -Milliseconds 300; $p.Play(); ` +
+    `Start-Sleep -Milliseconds ${waitMs}; $p.Close()`
+  const encoded = Buffer.from(script, 'utf16le').toString('base64')
+  return `powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`
+}
+
 function buildPlayCommand(targets: AudioTargets): { command: string; args: string[] } {
   if (process.platform === 'darwin') {
     return { command: 'afplay', args: [path.resolve(targets.ogg)] }

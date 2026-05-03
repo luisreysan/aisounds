@@ -2,7 +2,12 @@ import path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { buildHookCommand, generateSimpleScript, generateStopScript } from './audio.js'
+import {
+  buildHookCommand,
+  buildWindowsMp3HookForAsyncHost,
+  generateSimpleScript,
+  generateStopScript,
+} from './audio.js'
 
 const originalPlatform = process.platform
 
@@ -58,6 +63,15 @@ describe('buildHookCommand', () => {
     expect(cmd).toContain('SoundPlayer')
     expect(cmd).toContain('task_complete.ogg')
     expect(cmd).not.toContain('PresentationCore')
+  })
+})
+
+describe('buildWindowsMp3HookForAsyncHost', () => {
+  it('uses -EncodedCommand without Start-Process for Claude-style async hooks', () => {
+    const cmd = buildWindowsMp3HookForAsyncHost('C:\\packs\\demo\\sounds\\x.mp3', 1200)
+    expect(cmd).toContain('powershell.exe')
+    expect(cmd).toContain('-EncodedCommand')
+    expect(cmd).not.toContain('Start-Process')
   })
 })
 
