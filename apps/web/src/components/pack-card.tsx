@@ -14,18 +14,19 @@ export function PackCard({ pack }: { pack: PackCardRow }) {
   return (
     <Card className="group relative overflow-hidden border-border/60 transition-colors hover:border-border">
       <Link href={`/packs/${pack.slug}`} className="flex h-full flex-col">
-        <div
-          className="relative flex h-32 items-end p-4 text-white"
-          style={{ background: gradient }}
-          aria-hidden="false"
-        >
-          <h3 className="text-lg font-semibold leading-tight drop-shadow">{pack.name}</h3>
+        <div className="relative flex h-32 items-end overflow-hidden p-4 text-white">
+          <div
+            className="absolute inset-0 scale-110"
+            style={{ background: gradient, filter: 'blur(0.3rem)' }}
+            aria-hidden="true"
+          />
+          <h3 className="relative text-lg font-semibold leading-tight drop-shadow">{pack.name}</h3>
           {pack.status === 'draft' ? (
-            <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-amber-500/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-black">
+            <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-full bg-amber-500/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-black">
               Draft
             </span>
           ) : null}
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-medium backdrop-blur">
+          <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-medium backdrop-blur">
             <Music className="h-3 w-3" />
             {pack.sound_count}
           </span>

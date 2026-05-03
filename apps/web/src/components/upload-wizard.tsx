@@ -727,14 +727,16 @@ function StepReview(props: {
         <CardTitle>Review and publish</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
-        <div
-          className="rounded-lg p-5 text-white"
-          style={{ background: generateGradient(props.slug) }}
-        >
-          <div className="text-xs uppercase tracking-wider opacity-80">/packs/{props.slug}</div>
-          <div className="mt-1 text-2xl font-semibold">{props.name}</div>
+        <div className="relative overflow-hidden rounded-lg p-5 text-white">
+          <div
+            className="absolute inset-0 scale-110"
+            style={{ background: generateGradient(props.slug), filter: 'blur(0.3rem)' }}
+            aria-hidden="true"
+          />
+          <div className="relative text-xs uppercase tracking-wider opacity-80">/packs/{props.slug}</div>
+          <div className="relative mt-1 text-2xl font-semibold">{props.name}</div>
           {props.description ? (
-            <p className="mt-2 text-sm opacity-90">{props.description}</p>
+            <p className="relative mt-2 text-sm opacity-90">{props.description}</p>
           ) : null}
         </div>
 

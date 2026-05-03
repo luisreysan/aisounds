@@ -54,11 +54,13 @@ export default async function PackDetailPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
-      <section
-        className="rounded-2xl border border-border/60 p-8 text-white shadow-sm"
-        style={{ background: gradient }}
-      >
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <section className="relative overflow-hidden rounded-2xl border border-border/60 p-8 text-white shadow-sm">
+        <div
+          className="absolute inset-0 scale-110"
+          style={{ background: gradient, filter: 'blur(0.3rem)' }}
+          aria-hidden="true"
+        />
+        <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80">
               <span>AISE v{pack.aise_version}</span>
