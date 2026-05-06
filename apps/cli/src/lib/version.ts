@@ -21,7 +21,7 @@ export function getCliVersion(): string {
       try {
         const raw = readFileSync(candidate, 'utf8')
         const parsed = JSON.parse(raw) as { version?: string; name?: string }
-        if (parsed.name === 'aisounds' && typeof parsed.version === 'string') {
+        if (parsed.name === '@aisounds/cli' && typeof parsed.version === 'string') {
           cached = parsed.version
           return cached
         }

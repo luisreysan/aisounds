@@ -8,6 +8,7 @@ export default defineConfig({
   sourcemap: true,
   dts: false,
   shims: true,
+  noExternal: ['@aisounds/core'],
   banner: {
     js: '#!/usr/bin/env node',
   },

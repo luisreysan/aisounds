@@ -7,15 +7,15 @@ soon).
 ## Commands
 
 ```bash
-npx aisounds install <slug>                   # install a pack (auto-detect tool)
-npx aisounds install <slug> --tool cursor     # target a specific tool
-npx aisounds install <slug> --tool claude-code
-npx aisounds install <slug> --global          # install into $HOME (default: project)
-npx aisounds remove  <slug>                   # revert the installer, keep user hooks
-npx aisounds list                             # installed packs (project + global)
-npx aisounds info    <slug>                   # metadata from aisounds.dev
-npx aisounds update                           # re-install packs whose upstream changed
-npx aisounds preview <slug>                   # play every sound of a pack
+npx @aisounds/cli install <slug>                   # install a pack (auto-detect tool)
+npx @aisounds/cli install <slug> --tool cursor     # target a specific tool
+npx @aisounds/cli install <slug> --tool claude-code
+npx @aisounds/cli install <slug> --global          # install into $HOME (default: project)
+npx @aisounds/cli remove  <slug>                   # revert the installer, keep user hooks
+npx @aisounds/cli list                             # installed packs (project + global)
+npx @aisounds/cli info    <slug>                   # metadata from aisounds.dev
+npx @aisounds/cli update                           # re-install packs whose upstream changed
+npx @aisounds/cli preview <slug>                   # play every sound of a pack
 ```
 
 ## How install works
@@ -68,9 +68,9 @@ Under **WSL2**, audio is usually forwarded to Windows speakers (or you run a Pul
 ## Development
 
 ```bash
-pnpm --filter aisounds build       # tsup → dist/index.js
-pnpm --filter aisounds test        # vitest run (installers + unzip)
-pnpm --filter aisounds type-check
+pnpm --filter @aisounds/cli build       # tsup → dist/index.js
+pnpm --filter @aisounds/cli test        # vitest run (installers + unzip)
+pnpm --filter @aisounds/cli type-check
 ```
 
 Run the local build directly against a dev server:

@@ -82,7 +82,7 @@ Si este monorepo usa otro comando específico, usar ese.
 ### Terminal B: compilar CLI
 
 ```bash
-pnpm --filter aisounds build
+pnpm --filter @aisounds/cli build
 ```
 
 ---
@@ -212,7 +212,7 @@ Si Linux pasa (instalación + hooks + descarga + preview) y la ruta `darwin` sig
 ## 10) Comando útil para test del paquete CLI
 
 ```bash
-pnpm --filter aisounds test
+pnpm --filter @aisounds/cli test
 ```
 
 Debe pasar la suite del CLI antes de validar manualmente en herramientas.

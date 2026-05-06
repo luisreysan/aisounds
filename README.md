@@ -28,7 +28,7 @@ aisounds/
 - **Node.js** 20 or newer (tested with 22)
 - **pnpm** 10 (installed via `npm install -g pnpm` or Corepack)
 - A **Supabase** cloud project (free tier is fine) with the GitHub provider
-  enabled — see [docs/auth-setup.md](docs/auth-setup.md)
+enabled — see [docs/auth-setup.md](docs/auth-setup.md)
 - A **GitHub OAuth App** whose callback points at Supabase, not at the app
 
 ## Bootstrap
@@ -43,10 +43,10 @@ pnpm install
 
 1. Sign in at [supabase.com](https://supabase.com) and create a new project.
 2. From the project dashboard collect:
-   - Project URL (`https://<ref>.supabase.co`)
-   - `anon` public key
-   - `service_role` secret key
-   - Database connection string (`Project Settings → Database → Connection string`)
+  - Project URL (`https://<ref>.supabase.co`)
+  - `anon` public key
+  - `service_role` secret key
+  - Database connection string (`Project Settings → Database → Connection string`)
 
 ### 3. Apply the schema
 
@@ -73,7 +73,7 @@ psql "$SUPABASE_DB_URL" -f supabase/migrations/0005_pack_helpers.sql
 
 ### 4. (Optional) Seed the database
 
-Once you've uploaded the audio files from [`seed-pack/`](./seed-pack/) to
+Once you've uploaded the audio files from `[seed-pack/](./seed-pack/)` to
 Supabase Storage under `sounds/packs/welcome-pack/sounds/` (see the
 `seed-pack/README.md`), run:
 
@@ -88,11 +88,11 @@ psql "$SUPABASE_DB_URL" \
 Follow [docs/auth-setup.md](docs/auth-setup.md). Summary:
 
 1. Create a GitHub OAuth App with the callback URL pointing at
-   `https://<project-ref>.supabase.co/auth/v1/callback`.
+  `https://<project-ref>.supabase.co/auth/v1/callback`.
 2. Paste its Client ID + Client Secret into
-   **Supabase dashboard → Authentication → OAuth Apps → GitHub**.
-3. Add `http://localhost:3000/**` and your deployed URL to
-   **Authentication → URL Configuration → Redirect URLs**.
+  **Supabase dashboard → Authentication → OAuth Apps → GitHub**.
+3. Add `http://localhost:3000/`** and your deployed URL to
+  **Authentication → URL Configuration → Redirect URLs**.
 
 No `GITHUB_CLIENT_ID` or `NEXTAUTH_SECRET` is needed in the app env — Supabase
 handles the OAuth flow end-to-end.
@@ -110,7 +110,7 @@ cp .env.template apps/web/.env.local
 pnpm dev
 ```
 
-Open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Common scripts (Turborepo)
 
@@ -127,23 +127,23 @@ pnpm format        # prettier --write across the monorepo
 This is an in-progress scaffolding.
 
 - **Phase 1** ✅ monorepo structure, shared event vocabulary, web/CLI skeletons,
-  Supabase schema.
+Supabase schema.
 - **Phase 2** ✅ Supabase Auth with GitHub OAuth, session refresh middleware,
-  avatar dropdown, auto-provisioned `public.users` row on first login.
+avatar dropdown, auto-provisioned `public.users` row on first login.
 - **Phase 3** ✅ `/packs` browse with filters, `/packs/[slug]` detail with
-  waveform player, optimistic voting, `/profile/[username]`, and the full
-  `/upload` wizard that transcodes to OGG + MP3 server-side. See
-  [docs/upload-flow.md](docs/upload-flow.md) for the architecture.
+waveform player, optimistic voting, `/profile/[username]`, and the full
+`/upload` wizard that transcodes to OGG + MP3 server-side. See
+[docs/upload-flow.md](docs/upload-flow.md) for the architecture.
 - **Phase 4** 🚧 downloadable `.zip` bundles via
-  `/api/packs/[slug]/bundle`, lightweight metadata at
-  `/api/packs/[slug]/meta`, and a real `aisounds` CLI with working
-  `install` / `remove` / `list` / `info` / `update` / `preview` commands
-  for Cursor and Claude Code (VS Code, Windsurf and Aider are advertised
-  as "coming soon" stubs).
+`/api/packs/[slug]/bundle`, lightweight metadata at
+`/api/packs/[slug]/meta`, and a real `aisounds` CLI with working
+`install` / `remove` / `list` / `info` / `update` / `preview` commands
+for Cursor and Claude Code (VS Code, Windsurf and Aider are advertised
+as "coming soon" stubs).
 - **Phase 5** ⏳ Remix UI, remaining tool installers, cached bundles in
-  Storage.
+Storage.
 
 ## License
 
-MIT for the code in this repository. Individual sound packs carry their own
+Apache-2.0 for the code in this repository. Individual sound packs carry their own
 license declared in the upload flow (CC0, CC-BY, CC-BY-SA or MIT).
