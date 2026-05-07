@@ -21,7 +21,6 @@ type PackRow = {
   name: string
   description: string | null
   license: string
-  cover_color: string | null
   aise_version: string
   status: string
   created_at: string
@@ -67,7 +66,7 @@ export async function GET(
   const { data: pack, error: packErr } = await admin
     .from('packs')
     .select(
-      'id, slug, name, description, license, cover_color, aise_version, status, created_at, published_at, author_id',
+      'id, slug, name, description, license, aise_version, status, created_at, published_at, author_id',
     )
     .eq('slug', slug)
     .maybeSingle<PackRow>()
@@ -173,7 +172,6 @@ export async function GET(
       author_url: author?.github_url ?? undefined,
       license: pack.license as PackManifest['pack']['license'],
       tags: tagSlugs,
-      cover_color: pack.cover_color ?? undefined,
       created_at: normalizeDateTime(pack.created_at),
       aise_version: pack.aise_version || '1.0',
     },

@@ -60,7 +60,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Welcome pack ---------------------------------------------------------------
 INSERT INTO public.packs (
-  id, slug, name, description, author_id, status, license, cover_color,
+  id, slug, name, description, author_id, status, license,
   aise_version, published_at
 )
 VALUES (
@@ -71,7 +71,6 @@ VALUES (
   '00000000-0000-0000-0000-00000000b0b0',
   'published',
   'CC0',
-  '#6366f1',
   '1.0',
   NOW()
 )
