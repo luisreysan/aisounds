@@ -49,23 +49,33 @@ export async function transcodeAudio(
 
   try {
     await writeFile(inputPath, input)
+    const sourceExt = extractExtension(inputFilename)
+    const fallbackInputFormat = sourceExt === 'mp3' ? 'mp3' : null
 
-    const oggDuration = await runFfmpeg(inputPath, oggPath, (cmd) =>
-      cmd
-        .inputOptions(['-vn'])
-        .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
-        .audioCodec('libvorbis')
-        .audioBitrate('96k')
-        .format('ogg'),
+    const oggDuration = await runFfmpegWithFallback(
+      inputPath,
+      oggPath,
+      (cmd) =>
+        cmd
+          .inputOptions(['-vn'])
+          .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
+          .audioCodec('libvorbis')
+          .audioBitrate('96k')
+          .format('ogg'),
+      fallbackInputFormat,
     )
 
-    const mp3Duration = await runFfmpeg(inputPath, mp3Path, (cmd) =>
-      cmd
-        .inputOptions(['-vn'])
-        .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
-        .audioCodec('libmp3lame')
-        .audioBitrate('128k')
-        .format('mp3'),
+    const mp3Duration = await runFfmpegWithFallback(
+      inputPath,
+      mp3Path,
+      (cmd) =>
+        cmd
+          .inputOptions(['-vn'])
+          .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
+          .audioCodec('libmp3lame')
+          .audioBitrate('128k')
+          .format('mp3'),
+      fallbackInputFormat,
     )
 
     const durationMs = oggDuration || mp3Duration
@@ -89,6 +99,7 @@ function runFfmpeg(
   inputPath: string,
   outputPath: string,
   configure: (cmd: ffmpeg.FfmpegCommand) => ffmpeg.FfmpegCommand,
+  forcedInputFormat?: string,
 ): Promise<number> {
   return new Promise((resolve, reject) => {
     let durationMs = 0
@@ -96,6 +107,9 @@ function runFfmpeg(
     const cmd = ffmpeg(inputPath).on('codecData', (data) => {
       durationMs = parseDurationString(data?.duration) ?? durationMs
     })
+    if (forcedInputFormat) {
+      cmd.inputFormat(forcedInputFormat)
+    }
 
     configure(cmd)
       .on('stderr', (line) => {
@@ -108,6 +122,22 @@ function runFfmpeg(
       .on('end', () => resolve(durationMs))
       .save(outputPath)
   })
+}
+
+async function runFfmpegWithFallback(
+  inputPath: string,
+  outputPath: string,
+  configure: (cmd: ffmpeg.FfmpegCommand) => ffmpeg.FfmpegCommand,
+  fallbackInputFormat: string | null,
+): Promise<number> {
+  try {
+    return await runFfmpeg(inputPath, outputPath, configure)
+  } catch (error) {
+    if (!(error instanceof AudioTranscodeError) || !fallbackInputFormat) {
+      throw error
+    }
+    return runFfmpeg(inputPath, outputPath, configure, fallbackInputFormat)
+  }
 }
 
 /**
@@ -128,4 +158,11 @@ function parseDurationString(value: string | undefined): number | null {
 
 function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80)
+}
+
+function extractExtension(name: string): string | null {
+  const idx = name.lastIndexOf('.')
+  if (idx < 0) return null
+  const ext = name.slice(idx + 1).toLowerCase()
+  return ext || null
 }

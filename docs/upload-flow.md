@@ -48,8 +48,9 @@ It enforces, in order:
 
 1. **Auth** — must be a logged-in Supabase user.
 2. **Ownership** — the pack belongs to the caller and is still `draft`.
-3. **MIME + size** — accepted types come from `FILE_RULES.accepted_mime_types`
-   and the file must be ≤ 1 MB.
+3. **Format + size** — accepted inputs are
+   `mp3`, `wav`, `ogg`, `flac`, `aac`, `m4a` (validated by MIME and/or
+   extension via `FILE_RULES`), and the file must be ≤ 1 MB.
 4. **Transcoding** — the source is written to a per-request tmp dir and
    ffmpeg produces two outputs in parallel:
    - `out.ogg` (libvorbis, 96 kbps)
@@ -70,9 +71,9 @@ It enforces, in order:
   run the `ffmpeg-static` postinstall script. The root `package.json` has
   `pnpm.onlyBuiltDependencies` listing it; if it fails, run
   `pnpm rebuild -r ffmpeg-static`.
-- **Invalid audio format** — the API returns HTTP 422 with a generic "Could
-  not process audio" message. Inspect the Next.js terminal logs for the
-  underlying ffmpeg stderr output.
+- **Invalid audio format** — the API returns HTTP 422 with a message listing
+  accepted input formats. Inspect the Next.js terminal logs for underlying
+  ffmpeg stderr details.
 - **Duration shows `0ms`** — fluent-ffmpeg's `codecData` event was not fired,
   usually because the file is not valid audio. The API will respond with
   422 in that case.

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { FILE_RULES, isSoundEvent } from '@aisounds/core'
+import { FILE_RULES, isAcceptedExtension, isAcceptedMimeType, isSoundEvent } from '@aisounds/core'
 
 import { AudioTranscodeError, transcodeAudio } from '@/lib/audio'
 import { createClient } from '@/lib/supabase/server'
@@ -67,9 +67,26 @@ export async function POST(req: Request) {
     )
   }
 
-  const mime = (file.type || '').toLowerCase()
-  if (mime && !(FILE_RULES.accepted_mime_types as readonly string[]).includes(mime)) {
-    return NextResponse.json({ error: `Unsupported mime type: ${mime}` }, { status: 415 })
+  const mime = normalizeMimeType(file.type)
+  const originalExt = extractExtension(file.name)
+  const hasAcceptedMime = !!mime && isAcceptedMimeType(mime)
+  const hasAcceptedExtension = !!originalExt && isAcceptedExtension(originalExt)
+
+  if (mime && !hasAcceptedMime && !hasAcceptedExtension) {
+    return NextResponse.json(
+      {
+        error: `Unsupported audio format (${mime}). Accepted inputs: ${FILE_RULES.accepted_extensions.join(', ')}`,
+      },
+      { status: 415 },
+    )
+  }
+  if (!mime && !hasAcceptedExtension) {
+    return NextResponse.json(
+      {
+        error: `Unsupported audio format. Accepted inputs: ${FILE_RULES.accepted_extensions.join(', ')}`,
+      },
+      { status: 415 },
+    )
   }
 
   const pack = await validateDraftPack(supabase, packId, user.id, 'accept uploads')
@@ -78,7 +95,6 @@ export async function POST(req: Request) {
   }
 
   const inputBuffer = Buffer.from(await file.arrayBuffer())
-  const originalExt = extractExtension(file.name)
 
   let transcoded
   try {
@@ -91,13 +107,15 @@ export async function POST(req: Request) {
         : ''
       return NextResponse.json(
         {
-          error: `Could not process audio. Make sure the file is a valid audio format.${detailText}`,
+          error: `Could not process audio. Upload one of: ${FILE_RULES.accepted_extensions.join(', ')}. The file will be transcoded to ogg/mp3.${detailText}`,
         },
         { status: 422 },
       )
     }
     return NextResponse.json(
-      { error: 'Could not process audio. Make sure the file is a valid audio format.' },
+      {
+        error: `Could not process audio. Upload one of: ${FILE_RULES.accepted_extensions.join(', ')}. The file will be transcoded to ogg/mp3.`,
+      },
       { status: 422 },
     )
   }
@@ -263,6 +281,10 @@ function extractExtension(name: string | undefined | null): string | null {
   if (idx < 0) return null
   const ext = name.slice(idx + 1).toLowerCase()
   return ext || null
+}
+
+function normalizeMimeType(value: string | undefined): string {
+  return (value ?? '').toLowerCase().trim().split(';', 1)[0] ?? ''
 }
 
 type DraftPackValidation =

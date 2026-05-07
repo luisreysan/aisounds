@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import {
   ALL_EVENTS,
   EVENT_SPEC,
+  FILE_RULES,
   hookMappingsForEvent,
   supportedEventsForTools,
   type SoundEvent,
@@ -519,6 +520,7 @@ function StepSounds(props: {
   onDiscard: () => void
   canProceed: boolean
 }) {
+  const acceptedInputFormats = FILE_RULES.accepted_extensions.join(', ')
   const toolLabel = (slug: string) => {
     const found = TOOL_OPTIONS.find((t) => t.slug === slug)
     return found?.label ?? slug
@@ -532,8 +534,8 @@ function StepSounds(props: {
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">
           Upload audio for each event supported by your selected tools. You must provide at least
-          the required events. Files are transcoded to OGG and MP3 server-side — max 1 MB and 10
-          seconds each.
+          the required events. Accepted inputs: {acceptedInputFormats}. Files are transcoded
+          server-side to OGG and MP3 — max 1 MB and 10 seconds each.
         </p>
 
         {props.tools.length > 0 ? (
@@ -673,7 +675,7 @@ function SoundRow({
                   <Upload className="mr-1.5 h-3.5 w-3.5" />
                   {state?.status === 'error'
                     ? 'Try another file'
-                    : 'Choose audio (mp3, wav, ogg, flac)'}
+                    : `Choose audio (${FILE_RULES.accepted_extensions.join(', ')})`}
                 </>
               )}
             </label>

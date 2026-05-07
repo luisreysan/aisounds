@@ -6,6 +6,10 @@
 export const FILE_RULES = {
   accepted_mime_types: [
     'audio/mpeg',
+    'audio/mp3',
+    'audio/x-mp3',
+    'audio/mpeg3',
+    'audio/x-mpeg-3',
     'audio/wav',
     'audio/wave',
     'audio/x-wav',
@@ -30,10 +34,16 @@ export type AcceptedExtension = (typeof FILE_RULES.accepted_extensions)[number]
 export type OutputFormat = (typeof FILE_RULES.output_formats)[number]
 
 export function isAcceptedMimeType(mime: string): mime is AcceptedMimeType {
-  return (FILE_RULES.accepted_mime_types as readonly string[]).includes(mime)
+  const normalized = normalizeMimeType(mime)
+  if (!normalized) return false
+  return (FILE_RULES.accepted_mime_types as readonly string[]).includes(normalized)
 }
 
 export function isAcceptedExtension(ext: string): ext is AcceptedExtension {
   const lowered = ext.toLowerCase().replace(/^\./, '')
   return (FILE_RULES.accepted_extensions as readonly string[]).includes(lowered)
+}
+
+function normalizeMimeType(mime: string): string {
+  return mime.toLowerCase().trim().split(';', 1)[0] ?? ''
 }

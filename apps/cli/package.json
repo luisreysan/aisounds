@@ -1,6 +1,6 @@
 {
   "name": "@aisounds/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI to install and manage AI Sounds packs for Cursor, VS Code, Claude Code, Windsurf and more.",
   "license": "Apache-2.0",
   "type": "module",
