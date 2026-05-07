@@ -62,21 +62,20 @@ export const cursorInstaller: Installer = {
       const sound = ctx.manifest.sounds[eventKey]
       if (!sound) continue
 
-      const ogg = path.join(ctx.packDir, sound.file)
-      const mp3 = sound.file_fallback ? path.join(ctx.packDir, sound.file_fallback) : undefined
+      const mp3 = path.join(ctx.packDir, sound.file)
 
       if (cursorEvent === 'stop') {
         const status: 'completed' | 'error' = eventKey === 'task_complete' ? 'completed' : 'error'
         stopSounds.push({
           status,
-          filePath: mp3 ?? ogg,
+          filePath: mp3,
           durationMs: sound.duration_ms,
         })
       } else {
         simpleEvents.push({
           cursorEvent,
           aisEvent: eventKey,
-          targets: { ogg, mp3, durationMs: sound.duration_ms },
+          targets: { mp3, durationMs: sound.duration_ms },
         })
       }
     }

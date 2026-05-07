@@ -9,10 +9,6 @@ import { logger } from '../lib/logger.js'
  * Plays each sound of a published pack back-to-back. Streams the audio URL
  * into a temp file so the system player works regardless of how the pack
  * was published.
- *
- * On Windows we prefer the MP3 version when available because the default
- * WPF MediaPlayer we use there cannot decode OGG/Vorbis without extra
- * codecs. macOS and Linux keep using the OGG file.
  */
 export async function preview(slug: string): Promise<void> {
   let meta
@@ -34,28 +30,29 @@ export async function preview(slug: string): Promise<void> {
   )
   await fs.mkdir(tmpRoot, { recursive: true })
 
-  const preferMp3 = process.platform === 'win32'
-
   try {
     for (const sound of meta.sounds) {
       logger.info(`▶ ${sound.event}`)
 
-      const oggPath = path.join(tmpRoot, `${sound.event}.ogg`)
-      if (!(await downloadTo(sound.url_ogg, oggPath))) continue
-
-      let mp3Path: string | undefined
-      if (preferMp3 && sound.url_mp3) {
-        const target = path.join(tmpRoot, `${sound.event}.mp3`)
-        if (await downloadTo(sound.url_mp3, target)) {
-          mp3Path = target
-        }
+      if (!sound.url_mp3) {
+        logger.warn(`Skipping ${sound.event}: pack metadata has no MP3 URL`)
+        continue
       }
+      const mp3Path = path.join(tmpRoot, `${sound.event}.mp3`)
+      if (!(await downloadTo(sound.url_mp3, mp3Path))) continue
 
       try {
-        await playFile({ ogg: oggPath, mp3: mp3Path, durationMs: sound.duration_ms })
+        await playFile({ mp3: mp3Path, durationMs: sound.duration_ms })
       } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        if (message.includes('no compatible Linux audio backend found')) {
+          logger.warn(
+            'No Linux audio backend found. Install one of: paplay (pulseaudio-utils), ffplay (ffmpeg), or mpv. Distorted/noisy sound usually means your system fell back to an unsupported player.',
+          )
+          continue
+        }
         logger.warn(
-          `Audio player failed: ${err instanceof Error ? err.message : String(err)}`,
+          `Audio player failed: ${message}`,
         )
       }
     }

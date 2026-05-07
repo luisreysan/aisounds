@@ -107,7 +107,7 @@ function fallbackManifest(slug: string) {
       aise_version: '1.0',
     },
     sounds: {
-      task_complete: { file: 'sounds/task_complete.ogg', duration_ms: 1, loop: false },
+      task_complete: { file: 'sounds/task_complete.mp3', duration_ms: 1, loop: false },
     },
   }
 }

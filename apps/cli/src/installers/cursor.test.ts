@@ -25,20 +25,17 @@ function makeManifest(slug = 'demo'): PackManifest {
     },
     sounds: {
       task_complete: {
-        file: 'sounds/task_complete.ogg',
-        file_fallback: 'sounds/task_complete.mp3',
+        file: 'sounds/task_complete.mp3',
         duration_ms: 1000,
         loop: false,
       },
       task_failed: {
-        file: 'sounds/task_failed.ogg',
-        file_fallback: 'sounds/task_failed.mp3',
+        file: 'sounds/task_failed.mp3',
         duration_ms: 800,
         loop: false,
       },
       prompt_sent: {
-        file: 'sounds/prompt_sent.ogg',
-        file_fallback: 'sounds/prompt_sent.mp3',
+        file: 'sounds/prompt_sent.mp3',
         duration_ms: 500,
         loop: false,
       },

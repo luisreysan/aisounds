@@ -30,9 +30,7 @@ type PackRow = {
 
 type SoundRow = {
   event: string
-  storage_path_ogg: string
   storage_path_mp3: string | null
-  public_url_ogg: string
   public_url_mp3: string | null
   duration_ms: number
   size_bytes: number
@@ -43,7 +41,7 @@ type SoundRow = {
  * GET /api/packs/[slug]/bundle
  *
  * Streams a zip archive containing the pack manifest (`aisounds.json`) and
- * every sound as both OGG and MP3 under `sounds/<event>.<ext>`. Used by the
+ * every sound as MP3 under `sounds/<event>.mp3`. Used by the
  * `aisounds` CLI to install a pack and by the web `Download` button.
  *
  * Query params:
@@ -88,7 +86,7 @@ export async function GET(
   const { data: soundRows, error: soundsErr } = await admin
     .from('sounds')
     .select(
-      'event, storage_path_ogg, storage_path_mp3, public_url_ogg, public_url_mp3, duration_ms, size_bytes, is_loop',
+      'event, storage_path_mp3, public_url_mp3, duration_ms, size_bytes, is_loop',
     )
     .eq('pack_id', pack.id)
 
@@ -132,23 +130,17 @@ export async function GET(
   await Promise.all(
     sounds.map(async (sound) => {
       const event = sound.event as SoundEvent
-      const oggBuf = await fetchStorageFile(sound.public_url_ogg)
-      if (oggBuf) {
-        zip.addFile(`sounds/${event}.ogg`, oggBuf)
-      }
-      if (sound.public_url_mp3) {
-        const mp3Buf = await fetchStorageFile(sound.public_url_mp3)
-        if (mp3Buf) {
-          zip.addFile(`sounds/${event}.mp3`, mp3Buf)
+      if (!sound.public_url_mp3) return
+      const mp3Buf = await fetchStorageFile(sound.public_url_mp3)
+      if (mp3Buf) {
+        zip.addFile(`sounds/${event}.mp3`, mp3Buf)
+        const spec = EVENT_SPEC[event]
+        soundsMap[event] = {
+          file: `sounds/${event}.mp3`,
+          duration_ms: Math.min(sound.duration_ms, spec?.maxMs ?? 10_000),
+          loop: sound.is_loop,
+          size_bytes: sound.size_bytes,
         }
-      }
-      const spec = EVENT_SPEC[event]
-      soundsMap[event] = {
-        file: `sounds/${event}.ogg`,
-        ...(sound.public_url_mp3 ? { file_fallback: `sounds/${event}.mp3` } : {}),
-        duration_ms: Math.min(sound.duration_ms, spec?.maxMs ?? 10_000),
-        loop: sound.is_loop,
-        size_bytes: sound.size_bytes,
       }
     }),
   )

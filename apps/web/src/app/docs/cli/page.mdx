@@ -122,6 +122,16 @@ Play every sound in a pack from the terminal, in order. Useful for auditioning p
 aisounds preview <slug>
 ```
 
+### Linux playback requirements
+
+On Linux, playback is best-effort and requires at least one backend:
+
+- `paplay` (`pulseaudio-utils`)
+- `ffplay` (`ffmpeg`)
+- `mpv` (`mpv`)
+
+If users hear distorted/noisy output, it usually means none of those backends are installed. Install at least one backend and retry `aisounds preview <slug>`.
+
 ## update
 
 Re-install packs whose upstream version has changed.

@@ -25,20 +25,17 @@ function manifest(): PackManifest {
     },
     sounds: {
       task_complete: {
-        file: 'sounds/task_complete.ogg',
-        file_fallback: 'sounds/task_complete.mp3',
+        file: 'sounds/task_complete.mp3',
         duration_ms: 1000,
         loop: false,
       },
       notification: {
-        file: 'sounds/notification.ogg',
-        file_fallback: 'sounds/notification.mp3',
+        file: 'sounds/notification.mp3',
         duration_ms: 500,
         loop: false,
       },
       approval_needed: {
-        file: 'sounds/approval_needed.ogg',
-        file_fallback: 'sounds/approval_needed.mp3',
+        file: 'sounds/approval_needed.mp3',
         duration_ms: 700,
         loop: false,
       },

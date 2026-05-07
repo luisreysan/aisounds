@@ -43,9 +43,9 @@ function makeManifest(): PackManifest {
       aise_version: '1.0',
     },
     sounds: {
-      task_complete: { file: 'tc.ogg', file_fallback: 'tc.mp3', duration_ms: 1000, loop: false },
-      task_failed: { file: 'tf.ogg', file_fallback: 'tf.mp3', duration_ms: 800, loop: false },
-      prompt_sent: { file: 'ps.ogg', file_fallback: 'ps.mp3', duration_ms: 500, loop: false },
+      task_complete: { file: 'tc.mp3', duration_ms: 1000, loop: false },
+      task_failed: { file: 'tf.mp3', duration_ms: 800, loop: false },
+      prompt_sent: { file: 'ps.mp3', duration_ms: 500, loop: false },
     },
   }
 }

@@ -28,23 +28,22 @@ describe('buildHookCommand', () => {
 
   it('uses afplay on macOS', () => {
     setPlatform('darwin')
-    const cmd = buildHookCommand({ ogg: '/tmp/x.ogg', durationMs: 1000 })
+    const cmd = buildHookCommand({ mp3: '/tmp/x.mp3', durationMs: 1000 })
     expect(cmd).toContain('afplay')
-    expect(cmd).toContain(path.resolve('/tmp/x.ogg'))
+    expect(cmd).toContain(path.resolve('/tmp/x.mp3'))
   })
 
-  it('uses the paplay/ffplay/aplay chain on Linux', () => {
+  it('uses the paplay/ffplay/mpv chain on Linux', () => {
     setPlatform('linux')
-    const cmd = buildHookCommand({ ogg: '/tmp/x.ogg', durationMs: 1000 })
+    const cmd = buildHookCommand({ mp3: '/tmp/x.mp3', durationMs: 1000 })
     expect(cmd).toContain('paplay')
     expect(cmd).toContain('ffplay')
-    expect(cmd).toContain('aplay')
+    expect(cmd).toContain('mpv')
   })
 
-  it('uses WPF MediaPlayer with the MP3 file on Windows when mp3 is provided', () => {
+  it('uses WPF MediaPlayer with the MP3 file on Windows', () => {
     setPlatform('win32')
     const cmd = buildHookCommand({
-      ogg: 'C:\\packs\\demo\\sounds\\task_complete.ogg',
       mp3: 'C:\\packs\\demo\\sounds\\task_complete.mp3',
       durationMs: 1200,
     })
@@ -55,23 +54,12 @@ describe('buildHookCommand', () => {
     expect(cmd).toContain('Start-Process')
     expect(cmd).toMatch(/Start-Sleep -Milliseconds \d+/)
   })
-
-  it('falls back to SoundPlayer with the OGG on Windows when mp3 is missing', () => {
-    setPlatform('win32')
-    const cmd = buildHookCommand({
-      ogg: 'C:\\packs\\demo\\sounds\\task_complete.ogg',
-      durationMs: 1200,
-    })
-    expect(cmd).toContain('SoundPlayer')
-    expect(cmd).toContain('task_complete.ogg')
-    expect(cmd).not.toContain('PresentationCore')
-  })
 })
 
 describe('bashSingleQuotedPath', () => {
   it('wraps paths and escapes single quotes for bash', () => {
-    expect(bashSingleQuotedPath('/tmp/x.ogg')).toBe(`'/tmp/x.ogg'`)
-    expect(bashSingleQuotedPath("/tmp/x's.ogg")).toBe(`'/tmp/x'\\''s.ogg'`)
+    expect(bashSingleQuotedPath('/tmp/x.mp3')).toBe(`'/tmp/x.mp3'`)
+    expect(bashSingleQuotedPath("/tmp/x's.mp3")).toBe(`'/tmp/x'\\''s.mp3'`)
   })
 })
 
@@ -80,18 +68,19 @@ describe('buildPlayCommand', () => {
     Object.defineProperty(process, 'platform', { value: originalPlatform, configurable: true })
   })
 
-  it('uses bash with paplay/ffplay/aplay chain on Linux like hooks', () => {
+  it('uses bash with paplay/ffplay/mpv chain on Linux like hooks', () => {
     Object.defineProperty(process, 'platform', { value: 'linux', configurable: true })
     const { command, args } = buildPlayCommand({
-      ogg: '/pack/sounds/ping.ogg',
+      mp3: '/pack/sounds/ping.mp3',
       durationMs: 400,
     })
     expect(command).toBe('bash')
     expect(args[0]).toBe('-c')
     expect(args[1]).toContain('paplay')
     expect(args[1]).toContain('ffplay')
-    expect(args[1]).toContain('aplay')
-    expect(args[1]).toMatch(/ping\.ogg/)
+    expect(args[1]).toContain('mpv')
+    expect(args[1]).toContain('no compatible Linux audio backend found')
+    expect(args[1]).toMatch(/ping\.mp3/)
   })
 })
 
@@ -133,8 +122,8 @@ describe('generateStopScript', () => {
   it('generates a macOS script with afplay that checks status', () => {
     const script = generateStopScript(
       [
-        { status: 'completed', filePath: '/packs/demo/sounds/task_complete.ogg', durationMs: 1000 },
-        { status: 'error', filePath: '/packs/demo/sounds/task_failed.ogg', durationMs: 800 },
+        { status: 'completed', filePath: '/packs/demo/sounds/task_complete.mp3', durationMs: 1000 },
+        { status: 'error', filePath: '/packs/demo/sounds/task_failed.mp3', durationMs: 800 },
       ],
       'darwin',
     )
@@ -143,22 +132,22 @@ describe('generateStopScript', () => {
     expect(script).toContain('"completed"')
     expect(script).toContain('"error"')
     expect(script).toContain('"aborted"')
-    expect(script).toContain('task_complete.ogg')
-    expect(script).toContain('task_failed.ogg')
+    expect(script).toContain('task_complete.mp3')
+    expect(script).toContain('task_failed.mp3')
     expect(script).toContain("echo '{}'")
   })
 
-  it('generates a Linux script with paplay/ffplay/aplay chain', () => {
+  it('generates a Linux script with paplay/ffplay/mpv chain', () => {
     const script = generateStopScript(
       [
-        { status: 'completed', filePath: '/packs/demo/sounds/task_complete.ogg', durationMs: 1000 },
+        { status: 'completed', filePath: '/packs/demo/sounds/task_complete.mp3', durationMs: 1000 },
       ],
       'linux',
     )
     expect(script).toContain('#!/bin/bash')
     expect(script).toContain('paplay')
     expect(script).toContain('ffplay')
-    expect(script).toContain('aplay')
+    expect(script).toContain('mpv')
     expect(script).toContain("echo '{}'")
   })
 })
@@ -166,7 +155,7 @@ describe('generateStopScript', () => {
 describe('generateSimpleScript', () => {
   it('generates a Windows script that drains stdin and plays sound', () => {
     const script = generateSimpleScript(
-      { ogg: 'C:\\packs\\demo\\sounds\\prompt_sent.ogg', mp3: 'C:\\packs\\demo\\sounds\\prompt_sent.mp3', durationMs: 500 },
+      { mp3: 'C:\\packs\\demo\\sounds\\prompt_sent.mp3', durationMs: 500 },
       'win32',
     )
     expect(script).toContain('PresentationCore')
@@ -180,7 +169,7 @@ describe('generateSimpleScript', () => {
 
   it('generates a macOS script that drains stdin and plays sound', () => {
     const script = generateSimpleScript(
-      { ogg: '/packs/demo/sounds/prompt_sent.ogg', durationMs: 500 },
+      { mp3: '/packs/demo/sounds/prompt_sent.mp3', durationMs: 500 },
       'darwin',
     )
     expect(script).toContain('#!/bin/bash')

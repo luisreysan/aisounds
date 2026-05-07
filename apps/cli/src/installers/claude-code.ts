@@ -62,14 +62,11 @@ export const claudeCodeInstaller: Installer = {
         : []
       const preserved = existing.filter((entry) => !isAisoundsEntry(entry))
 
-      const ogg = path.join(ctx.packDir, sound.file)
-      const mp3 = sound.file_fallback
-        ? path.join(ctx.packDir, sound.file_fallback)
-        : undefined
+      const mp3 = path.join(ctx.packDir, sound.file)
       const command =
-        process.platform === 'win32' && mp3
+        process.platform === 'win32'
           ? buildWindowsMp3HookForAsyncHost(mp3, sound.duration_ms)
-          : buildHookCommand({ ogg, mp3, durationMs: sound.duration_ms })
+          : buildHookCommand({ mp3, durationMs: sound.duration_ms })
       const hookEntry: ClaudeHookEntry = {
         type: 'command',
         command,

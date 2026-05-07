@@ -55,6 +55,20 @@ npx @aisounds/cli@latest activate <slug>
 
 Each install writes only to its tool's config file; they do not conflict.
 
+## Linux audio prerequisites
+
+On Linux, hook playback is best-effort and expects at least one available backend:
+
+- `paplay` (package: `pulseaudio-utils`)
+- `ffplay` (package: `ffmpeg`)
+- `mpv` (package: `mpv`)
+
+If the user reports noisy/distorted output, treat it as a missing backend issue and tell them to install at least one of the three backends above, then run:
+
+```bash
+npx @aisounds/cli@latest preview <slug>
+```
+
 ## Verifying
 
 ```bash

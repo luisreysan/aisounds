@@ -2,10 +2,8 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 
 export interface AudioTargets {
-  /** Absolute path to the OGG file. Required, always present in bundles. */
-  ogg: string
-  /** Absolute path to the MP3 file if the bundle shipped one. */
-  mp3?: string
+  /** Absolute path to the MP3 file. */
+  mp3: string
   /** Duration of the sound in milliseconds, used to keep Windows players alive. */
   durationMs: number
 }
@@ -15,33 +13,25 @@ export interface AudioTargets {
  * sound. Picks the format the host OS can reliably play without extra
  * codecs:
  *
- *   - macOS  →  `afplay <ogg>` (afplay supports ogg/mp3/wav)
- *   - Linux  →  chain of paplay / ffplay / aplay (ogg is safe)
+ *   - macOS  →  `afplay <mp3>`
+ *   - Linux  →  chain of paplay / ffplay / mpv (best-effort)
  *   - Windows → WPF `System.Windows.Media.MediaPlayer` with the MP3 file.
- *     `System.Media.SoundPlayer` only supports WAV, so OGG is useless there.
  *     The player is launched through `Start-Process` so the caller (Cursor
  *     hook, Claude Code hook, etc.) does not block for the duration of the
  *     clip.
- *
- * When the bundle did not ship an MP3 on Windows we fall back to the
- * `SoundPlayer` behaviour of previous versions, which will likely fail but
- * keeps the hook installable without crashing.
  */
 export function buildHookCommand(targets: AudioTargets): string {
+  const mp3 = path.resolve(targets.mp3)
   if (process.platform === 'darwin') {
-    return `afplay "${path.resolve(targets.ogg)}" >/dev/null 2>&1 &`
+    return `afplay "${mp3}" >/dev/null 2>&1 &`
   }
 
   if (process.platform === 'win32') {
-    if (targets.mp3) {
-      return buildWindowsMp3Hook(targets.mp3, targets.durationMs)
-    }
-    const oggPath = path.resolve(targets.ogg).replace(/'/g, "''")
-    return `powershell -NoProfile -WindowStyle Hidden -Command "(New-Object Media.SoundPlayer '${oggPath}').PlaySync()"`
+    return buildWindowsMp3Hook(targets.mp3, targets.durationMs)
   }
 
-  const ogg = path.resolve(targets.ogg)
-  return `(command -v paplay >/dev/null && paplay "${ogg}" || command -v ffplay >/dev/null && ffplay -nodisp -autoexit "${ogg}" || aplay "${ogg}") >/dev/null 2>&1 &`
+  const quotedPath = bashSingleQuotedPath(mp3)
+  return `${buildLinuxPlayCommand(quotedPath)} >/dev/null 2>&1 &`
 }
 
 /**
@@ -53,12 +43,23 @@ export function playFile(targets: AudioTargets): Promise<void> {
   const { command, args } = buildPlayCommand(targets)
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: 'ignore',
+      stdio: ['ignore', 'ignore', 'pipe'],
       shell: false,
       windowsHide: true,
     })
+    let stderr = ''
+    child.stderr?.on('data', (chunk) => {
+      stderr += chunk.toString()
+    })
     child.once('error', reject)
-    child.once('exit', () => resolve())
+    child.once('exit', (code) => {
+      if (!code || code === 0) {
+        resolve()
+        return
+      }
+      const message = stderr.trim() || `Audio player failed with exit code ${code}`
+      reject(new Error(message))
+    })
   })
 }
 
@@ -104,16 +105,16 @@ export function bashSingleQuotedPath(absPath: string): string {
 }
 
 /**
- * Spawn args used by {@link playFile}. On Linux/other Unix hooks use paplay/ffplay/aplay;
- * preview now uses the same chain so WSL/Linux work without FFmpeg when Pulse is available.
+ * Spawn args used by {@link playFile}. On Linux/other Unix hooks use paplay/ffplay/mpv;
+ * preview prints a warning when no supported backend is available.
  */
 export function buildPlayCommand(targets: AudioTargets): { command: string; args: string[] } {
+  const mp3 = path.resolve(targets.mp3)
   if (process.platform === 'darwin') {
-    return { command: 'afplay', args: [path.resolve(targets.ogg)] }
+    return { command: 'afplay', args: [mp3] }
   }
   if (process.platform === 'win32') {
-    const source = targets.mp3 ?? targets.ogg
-    const safePath = path.resolve(source).replace(/'/g, "''")
+    const safePath = mp3.replace(/'/g, "''")
     const waitMs = Math.max(500, targets.durationMs + 1500)
     return {
       command: 'powershell.exe',
@@ -126,12 +127,25 @@ export function buildPlayCommand(targets: AudioTargets): { command: string; args
       ],
     }
   }
-  const ogg = bashSingleQuotedPath(path.resolve(targets.ogg))
-  const compound = `(command -v paplay >/dev/null && paplay ${ogg} || command -v ffplay >/dev/null && ffplay -nodisp -autoexit -loglevel quiet ${ogg} || aplay ${ogg})`
+  const quotedPath = bashSingleQuotedPath(mp3)
+  const compound = buildLinuxPlayCommand(quotedPath, true)
   return {
     command: 'bash',
     args: ['-c', compound],
   }
+}
+
+function buildLinuxPlayCommand(quotedPath: string, warnOnFailure = false): string {
+  const chain =
+    `(command -v paplay >/dev/null && paplay ${quotedPath} ` +
+    `|| command -v ffplay >/dev/null && ffplay -nodisp -autoexit -loglevel quiet ${quotedPath} ` +
+    `|| command -v mpv >/dev/null && mpv --no-video --no-terminal --really-quiet ${quotedPath})`
+  if (!warnOnFailure) return chain
+  return (
+    `${chain} || { ` +
+    `printf '%s\\n' 'aisounds: no compatible Linux audio backend found. Install paplay (pulseaudio-utils), ffplay (ffmpeg), or mpv.' >&2; ` +
+    'exit 1; }'
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -234,7 +248,8 @@ function generateStopScriptUnix(sounds: StopSoundEntry[], platform: NodeJS.Platf
     if (platform === 'darwin') {
       return `afplay "${resolved}" >/dev/null 2>&1 &`
     }
-    return `(command -v paplay >/dev/null && paplay "${resolved}" || command -v ffplay >/dev/null && ffplay -nodisp -autoexit "${resolved}" || aplay "${resolved}") >/dev/null 2>&1 &`
+    const quotedPath = bashSingleQuotedPath(resolved)
+    return `${buildLinuxPlayCommand(quotedPath)} >/dev/null 2>&1 &`
   }
 
   const lines: string[] = [
@@ -262,8 +277,7 @@ function generateStopScriptUnix(sounds: StopSoundEntry[], platform: NodeJS.Platf
 }
 
 function generateSimpleScriptWindows(targets: AudioTargets): string {
-  const source = targets.mp3 ?? targets.ogg
-  const safePath = path.resolve(source).replace(/'/g, "''")
+  const safePath = path.resolve(targets.mp3).replace(/'/g, "''")
   const waitMs = Math.max(500, targets.durationMs + 1500)
 
   return [
@@ -282,12 +296,13 @@ function generateSimpleScriptWindows(targets: AudioTargets): string {
 }
 
 function generateSimpleScriptUnix(targets: AudioTargets, platform: NodeJS.Platform): string {
-  const resolved = path.resolve(targets.ogg)
+  const resolved = path.resolve(targets.mp3)
   let playLine: string
   if (platform === 'darwin') {
     playLine = `afplay "${resolved}" >/dev/null 2>&1 &`
   } else {
-    playLine = `(command -v paplay >/dev/null && paplay "${resolved}" || command -v ffplay >/dev/null && ffplay -nodisp -autoexit "${resolved}" || aplay "${resolved}") >/dev/null 2>&1 &`
+    const quotedPath = bashSingleQuotedPath(resolved)
+    playLine = `${buildLinuxPlayCommand(quotedPath)} >/dev/null 2>&1 &`
   }
 
   return [

@@ -37,7 +37,6 @@ export interface PackMeta {
     duration_ms: number
     size_bytes: number
     is_loop: boolean
-    url_ogg: string
     url_mp3: string | null
   }>
 }

@@ -25,7 +25,7 @@ function validManifest(): PackManifest {
       aise_version: '1.0',
     },
     sounds: {
-      task_complete: { file: 'sounds/task_complete.ogg', duration_ms: 1000, loop: false },
+      task_complete: { file: 'sounds/task_complete.mp3', duration_ms: 1000, loop: false },
     },
   }
 }
@@ -33,7 +33,7 @@ function validManifest(): PackManifest {
 function makeZip(manifest: unknown): Buffer {
   const zip = new AdmZip()
   zip.addFile('aisounds.json', Buffer.from(JSON.stringify(manifest), 'utf8'))
-  zip.addFile('sounds/task_complete.ogg', Buffer.from('fake-ogg'))
+  zip.addFile('sounds/task_complete.mp3', Buffer.from('fake-mp3'))
   return zip.toBuffer()
 }
 
@@ -54,13 +54,13 @@ describe('extractBundle', () => {
 
     expect(dir).toBe(target)
     expect(manifest.pack.slug).toBe('demo')
-    await expect(fs.access(path.join(target, 'sounds', 'task_complete.ogg'))).resolves.toBeUndefined()
+    await expect(fs.access(path.join(target, 'sounds', 'task_complete.mp3'))).resolves.toBeUndefined()
   })
 
   it('rejects a manifest missing the task_complete event', async () => {
     const bad = {
       ...validManifest(),
-      sounds: { prompt_sent: { file: 'sounds/prompt_sent.ogg', duration_ms: 500, loop: false } },
+      sounds: { prompt_sent: { file: 'sounds/prompt_sent.mp3', duration_ms: 500, loop: false } },
     }
     await expect(
       extractBundle(makeZip(bad), path.join(root, 'demo')),
@@ -71,7 +71,7 @@ describe('extractBundle', () => {
     const zip = new AdmZip()
     zip.addFile('../escape.txt', Buffer.from('nope'))
     zip.addFile('aisounds.json', Buffer.from(JSON.stringify(validManifest()), 'utf8'))
-    zip.addFile('sounds/task_complete.ogg', Buffer.from('ogg'))
+    zip.addFile('sounds/task_complete.mp3', Buffer.from('mp3'))
 
     const target = path.join(root, 'demo')
     await extractBundle(zip.toBuffer(), target)
@@ -82,7 +82,7 @@ describe('extractBundle', () => {
 
   it('rejects missing manifest', async () => {
     const zip = new AdmZip()
-    zip.addFile('sounds/task_complete.ogg', Buffer.from('ogg'))
+    zip.addFile('sounds/task_complete.mp3', Buffer.from('mp3'))
     await expect(extractBundle(zip.toBuffer(), path.join(root, 'demo'))).rejects.toThrow(
       /missing aisounds.json/,
     )

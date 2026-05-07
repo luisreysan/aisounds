@@ -24,8 +24,7 @@ Every command pulls a zipped bundle from
 `${AISOUNDS_API_URL}/api/packs/<slug>/bundle`
 (default base URL `https://aisounds.dev`). The bundle contains an
 `aisounds.json` manifest validated against `@aisounds/core`
-`PackManifestSchema` plus every sound as `sounds/<event>.ogg`
-(and `.mp3` as fallback).
+`PackManifestSchema` plus every sound as `sounds/<event>.mp3`.
 
 Files are extracted to:
 
@@ -55,15 +54,19 @@ That's what powers `aisounds list` and `aisounds update`.
 
 The CLI detects the OS (`mac`, `windows`, or `linux` for bundles on Linux—including **WSL**). Downloads and installs are the same Unix flow as on a bare-metal Linux laptop.
 
-For **audio playback**, hooks try (in order) **PulseAudio** `paplay`, **FFmpeg** `ffplay`, then ALSA `aplay`. On Debian/Ubuntu you usually want at least:
+For **audio playback on Linux**, hooks try (in order) **PulseAudio** `paplay`, **FFmpeg** `ffplay`, then **mpv** `mpv`.
+This is best-effort (no hard dependency), but you need at least one of these binaries installed.
+On Debian/Ubuntu you usually want:
 
 ```bash
-sudo apt update && sudo apt install -y pulseaudio-utils ffmpeg
+sudo apt update && sudo apt install -y pulseaudio-utils ffmpeg mpv
 ```
 
 On **macOS**, hooks use **`afplay`**.
 
-Under **WSL2**, audio is usually forwarded to Windows speakers (or you run a PulseAudio server in WSL). If you hear nothing, run `aisounds preview <slug>` and separately test `paplay /usr/share/sounds/alsa/Front_Center.wav` (or any short WAV) — if that fails too, fix WSL/Linux audio before debugging the CLI.
+If Linux audio sounds distorted/noisy, your system is likely missing `paplay`, `ffplay`, and `mpv` and is falling back to an incompatible player path. Install at least one of them, then re-run `aisounds preview <slug>`.
+
+Under **WSL2**, audio is usually forwarded to Windows speakers (or you run a PulseAudio server in WSL). If you hear nothing, run `aisounds preview <slug>` and separately test one backend (for example `paplay /usr/share/sounds/alsa/Front_Center.wav`) — if that fails too, fix WSL/Linux audio before debugging the CLI.
 
 ## Development
 
