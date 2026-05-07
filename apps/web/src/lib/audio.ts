@@ -1,4 +1,5 @@
 import 'server-only'
+import { accessSync, constants as fsConstants, existsSync } from 'node:fs'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -11,8 +12,10 @@ import ffmpeg from 'fluent-ffmpeg'
  * package so the app works on serverless hosts (Vercel) without requiring
  * a system ffmpeg install.
  */
-if (ffmpegPath) {
-  ffmpeg.setFfmpegPath(ffmpegPath as unknown as string)
+const ffmpegBinary = resolveFfmpegBinary()
+
+if (ffmpegBinary.path) {
+  ffmpeg.setFfmpegPath(ffmpegBinary.path)
 }
 
 export class AudioTranscodeError extends Error {
@@ -42,6 +45,8 @@ export async function transcodeAudio(
   input: Buffer,
   inputFilename: string,
 ): Promise<TranscodeResult> {
+  ensureFfmpegAvailable()
+
   const workdir = await mkdtemp(join(tmpdir(), 'aisounds-'))
   const inputPath = join(workdir, safeFilename(inputFilename) || 'input.bin')
   const oggPath = join(workdir, 'out.ogg')
@@ -208,4 +213,40 @@ function probeDurationMs(path: string): Promise<number> {
       resolve(Math.max(0, Math.round(seconds * 1000)))
     })
   })
+}
+
+function resolveFfmpegBinary(): { path: string | null; reason: string | null } {
+  const candidate = typeof ffmpegPath === 'string' ? ffmpegPath : null
+  if (!candidate) {
+    return {
+      path: null,
+      reason: 'ffmpeg-static did not return a binary path in this environment',
+    }
+  }
+  if (!existsSync(candidate)) {
+    return {
+      path: null,
+      reason: `ffmpeg binary path does not exist: ${candidate}`,
+    }
+  }
+  try {
+    accessSync(candidate, fsConstants.X_OK)
+  } catch {
+    try {
+      accessSync(candidate, fsConstants.R_OK)
+    } catch {
+      return {
+        path: null,
+        reason: `ffmpeg binary is not accessible: ${candidate}`,
+      }
+    }
+  }
+  return { path: candidate, reason: null }
+}
+
+function ensureFfmpegAvailable(): void {
+  if (ffmpegBinary.path) return
+  throw new AudioTranscodeError(
+    `ffmpeg binary is unavailable. ${ffmpegBinary.reason ?? 'Missing binary path'}`,
+  )
 }

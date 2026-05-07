@@ -102,6 +102,18 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error('[upload] ffmpeg failed', err)
     if (err instanceof AudioTranscodeError) {
+      const infrastructureIssue =
+        err.message.toLowerCase().includes('ffmpeg binary is unavailable') ||
+        err.message.toLowerCase().includes('spawn') ||
+        err.message.toLowerCase().includes('enoent')
+
+      if (infrastructureIssue) {
+        console.error('[upload] ffmpeg runtime unavailable in deployment artifact', {
+          reason: err.message,
+          details: err.ffmpegDetails ?? null,
+        })
+      }
+
       const detailText = err.ffmpegDetails
         ? ` ffmpeg details: ${err.ffmpegDetails.replace(/\s+/g, ' ').trim()}`
         : ''
