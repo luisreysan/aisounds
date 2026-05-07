@@ -65,18 +65,37 @@ export async function transcodeAudio(
       fallbackInputFormat,
     )
 
-    const mp3Duration = await runFfmpegWithFallback(
-      inputPath,
-      mp3Path,
-      (cmd) =>
-        cmd
-          .inputOptions(['-vn'])
-          .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
-          .audioCodec('libmp3lame')
-          .audioBitrate('128k')
-          .format('mp3'),
-      fallbackInputFormat,
-    )
+    let mp3Duration: number
+    try {
+      mp3Duration = await runFfmpegWithFallback(
+        inputPath,
+        mp3Path,
+        (cmd) =>
+          cmd
+            .inputOptions(['-vn'])
+            .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
+            .audioCodec('libmp3lame')
+            .audioBitrate('128k')
+            .format('mp3'),
+        fallbackInputFormat,
+      )
+    } catch (error) {
+      if (!(error instanceof AudioTranscodeError) || !hasMissingLameEncoder(error)) {
+        throw error
+      }
+      mp3Duration = await runFfmpegWithFallback(
+        inputPath,
+        mp3Path,
+        (cmd) =>
+          cmd
+            .inputOptions(['-vn'])
+            .outputOptions(['-map_metadata', '-1', '-ac', '2', '-ar', '44100'])
+            .audioCodec('mp3')
+            .audioBitrate('128k')
+            .format('mp3'),
+        fallbackInputFormat,
+      )
+    }
 
     const durationMs = oggDuration || mp3Duration
     if (!durationMs || durationMs <= 0) {
@@ -165,4 +184,9 @@ function extractExtension(name: string): string | null {
   if (idx < 0) return null
   const ext = name.slice(idx + 1).toLowerCase()
   return ext || null
+}
+
+function hasMissingLameEncoder(error: AudioTranscodeError): boolean {
+  const text = `${error.message}\n${error.ffmpegDetails ?? ''}`.toLowerCase()
+  return text.includes("unknown encoder 'libmp3lame'") || text.includes('unknown encoder "libmp3lame"')
 }
