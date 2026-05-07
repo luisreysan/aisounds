@@ -1,0 +1,26 @@
+{
+  "name": "@aisounds/claude-hook-session-summary-tts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Claude Code Stop hook that speaks an AI-generated voice summary of the session via ElevenLabs or Gemini TTS.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install:hook": "node ./install.mjs",
+    "uninstall:hook": "node ./uninstall.mjs"
+  },
+  "bin": {
+    "session-summary-tts": "./index.mjs",
+    "session-summary-tts-install": "./install.mjs",
+    "session-summary-tts-uninstall": "./uninstall.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "install.mjs",
+    "uninstall.mjs",
+    ".env.example",
+    "README.md"
+  ]
+}
