@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   // ffmpeg-static and fluent-ffmpeg must not be bundled — they read binaries at runtime
   serverExternalPackages: ['fluent-ffmpeg', 'ffmpeg-static'],
+  outputFileTracingIncludes: {
+    // Ensure ffmpeg-static binary is packaged with the upload route on Vercel.
+    '/api/upload/sound': ['node_modules/.pnpm/ffmpeg-static@*/node_modules/ffmpeg-static/**'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
