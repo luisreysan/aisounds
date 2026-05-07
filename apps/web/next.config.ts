@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['fluent-ffmpeg', 'ffmpeg-static'],
   outputFileTracingIncludes: {
     // Ensure ffmpeg-static binary is packaged with the upload route on Vercel.
+    '/api/upload/sound': [
+      'node_modules/.pnpm/ffmpeg-static@*/node_modules/ffmpeg-static/**',
+      'node_modules/ffmpeg-static/**',
+    ],
     '/api/upload/sound/route': [
       'node_modules/.pnpm/ffmpeg-static@*/node_modules/ffmpeg-static/**',
       'node_modules/ffmpeg-static/**',

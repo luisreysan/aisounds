@@ -1,8 +1,9 @@
 import 'server-only'
 import { accessSync, constants as fsConstants, existsSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
@@ -216,32 +217,49 @@ function probeDurationMs(path: string): Promise<number> {
 }
 
 function resolveFfmpegBinary(): { path: string | null; reason: string | null } {
-  const candidate = typeof ffmpegPath === 'string' ? ffmpegPath : null
-  if (!candidate) {
-    return {
-      path: null,
-      reason: 'ffmpeg-static did not return a binary path in this environment',
-    }
+  const executableName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
+  const reasons: string[] = []
+  const candidates = new Set<string>()
+  const directPath = typeof ffmpegPath === 'string' ? ffmpegPath : null
+  if (directPath) {
+    candidates.add(directPath)
+  } else {
+    reasons.push('ffmpeg-static did not return a binary path in this environment')
   }
-  if (!existsSync(candidate)) {
-    return {
-      path: null,
-      reason: `ffmpeg binary path does not exist: ${candidate}`,
-    }
-  }
+
   try {
-    accessSync(candidate, fsConstants.X_OK)
+    const require = createRequire(import.meta.url)
+    const pkgPath = require.resolve('ffmpeg-static/package.json')
+    candidates.add(join(dirname(pkgPath), executableName))
   } catch {
+    reasons.push('could not resolve ffmpeg-static/package.json in runtime bundle')
+  }
+
+  candidates.add(join(process.cwd(), 'node_modules', 'ffmpeg-static', executableName))
+  candidates.add(join('/var/task/node_modules/ffmpeg-static', executableName))
+
+  for (const candidate of candidates) {
+    if (!existsSync(candidate)) {
+      reasons.push(`missing: ${candidate}`)
+      continue
+    }
     try {
-      accessSync(candidate, fsConstants.R_OK)
+      accessSync(candidate, fsConstants.X_OK)
+      return { path: candidate, reason: null }
     } catch {
-      return {
-        path: null,
-        reason: `ffmpeg binary is not accessible: ${candidate}`,
+      try {
+        accessSync(candidate, fsConstants.R_OK)
+        return { path: candidate, reason: null }
+      } catch {
+        reasons.push(`not accessible: ${candidate}`)
       }
     }
   }
-  return { path: candidate, reason: null }
+
+  return {
+    path: null,
+    reason: reasons.join(' | '),
+  }
 }
 
 function ensureFfmpegAvailable(): void {
