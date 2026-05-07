@@ -4,6 +4,8 @@ If you are an AI coding assistant (Cursor agent, Claude Code, ChatGPT in a CLI s
 
 There is also a machine-friendly index at /llms.txt and a self-contained dump at /llms-full.txt.
 
+The CLI is published on npm as **`@aisounds/cli`** (the installed binary is named `aisounds`).
+
 ## When the user asks for a sound pack
 
 1. **Find the pack slug.** It is in the URL of the pack page: `aisounds.dev/packs/<slug>`. The user will usually paste it directly.
@@ -19,15 +21,15 @@ Run these from the **project root** the user wants the sounds in.
 For Cursor:
 
 ```bash
-npx aisounds@latest install <slug> --tool cursor
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool cursor
+npx @aisounds/cli@latest activate <slug>
 ```
 
 For Claude Code:
 
 ```bash
-npx aisounds@latest install <slug> --tool claude-code
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool claude-code
+npx @aisounds/cli@latest activate <slug>
 ```
 
 After installing, **tell the user to restart their tool** so the hook config is reloaded.
@@ -37,9 +39,9 @@ After installing, **tell the user to restart their tool** so the hook config is 
 If the user uses both Cursor and Claude Code, install for both:
 
 ```bash
-npx aisounds@latest install <slug> --tool cursor
-npx aisounds@latest install <slug> --tool claude-code
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool cursor
+npx @aisounds/cli@latest install <slug> --tool claude-code
+npx @aisounds/cli@latest activate <slug>
 ```
 
 Each install writes only to its tool's config file; they do not conflict.
@@ -47,7 +49,7 @@ Each install writes only to its tool's config file; they do not conflict.
 ## Verifying
 
 ```bash
-npx aisounds@latest list
+npx @aisounds/cli@latest list
 ```
 
 Look for the pack slug followed by `*` — that's the active pack. If a sound does not play, check:
@@ -62,7 +64,7 @@ Look for the pack slug followed by `*` — that's the active pack. If a sound do
 If the user wants only some sounds, do not edit the hook configs by hand. Use:
 
 ```bash
-npx aisounds@latest sounds <slug>
+npx @aisounds/cli@latest sounds <slug>
 ```
 
 This is interactive (checkbox UI). If you cannot run interactive commands, ask the user to run it themselves and explain that they can deselect events they don't want.
@@ -70,7 +72,7 @@ This is interactive (checkbox UI). If you cannot run interactive commands, ask t
 ## Removing
 
 ```bash
-npx aisounds@latest remove <slug>
+npx @aisounds/cli@latest remove <slug>
 ```
 
 Removes the pack and reverts every hook entry the CLI wrote for it.

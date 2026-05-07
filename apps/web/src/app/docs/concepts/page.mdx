@@ -37,8 +37,8 @@ Same pack, same audio files under `.aisounds/packs/<slug>/`, but each tool gets 
 You select the tool with `--tool` on `install`:
 
 ```bash
-npx aisounds@latest install retro-beeps --tool cursor
-npx aisounds@latest install retro-beeps --tool claude-code
+npx @aisounds/cli@latest install retro-beeps --tool cursor
+npx @aisounds/cli@latest install retro-beeps --tool claude-code
 ```
 
 You can run both commands to install the same pack in **both** tools. They don't conflict — they write to different config files.
@@ -70,18 +70,18 @@ You can fill multiple cells at once. For example:
 
 ```bash
 # Pack A in this project, Cursor + Claude
-npx aisounds@latest install pack-a --tool cursor
-npx aisounds@latest install pack-a --tool claude-code
+npx @aisounds/cli@latest install pack-a --tool cursor
+npx @aisounds/cli@latest install pack-a --tool claude-code
 
 # Pack B globally for Claude only
-npx aisounds@latest install pack-b --tool claude-code --global
+npx @aisounds/cli@latest install pack-b --tool claude-code --global
 ```
 
 `activate` works **per scope**: activating in project does not change global, and vice versa.
 
 ```bash
-npx aisounds@latest activate pack-a              # affects project state only
-npx aisounds@latest activate pack-b --global     # affects global state only
+npx @aisounds/cli@latest activate pack-a              # affects project state only
+npx @aisounds/cli@latest activate pack-b --global     # affects global state only
 ```
 
 ## 4. Mental model

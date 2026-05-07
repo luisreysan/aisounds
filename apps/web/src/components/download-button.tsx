@@ -51,7 +51,7 @@ export function DownloadButton({ packId, packSlug, soundCount }: DownloadButtonP
       document.body.removeChild(link)
 
       toast.success('Download started', {
-        description: `Unzip and run \`npx aisounds install ${packSlug}\` to wire it into your AI tool.`,
+        description: `Unzip and run \`npx @aisounds/cli install ${packSlug}\` to wire it into your AI tool.`,
       })
     })
   }

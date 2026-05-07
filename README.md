@@ -14,7 +14,7 @@ Windsurf, Aider, etc.).
 aisounds/
 ├── apps/
 │   ├── web/          → Next.js 15 website (deployed to Vercel)
-│   └── cli/          → npm package `aisounds` (the `npx aisounds ...` CLI)
+│   └── cli/          → npm package `@aisounds/cli` (the `npx @aisounds/cli ...` CLI, binary `aisounds`)
 ├── packages/
 │   └── core/         → Shared AISE event vocabulary, manifest schema, rules
 ├── supabase/

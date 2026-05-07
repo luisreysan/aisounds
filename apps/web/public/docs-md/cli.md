@@ -1,9 +1,16 @@
 # CLI reference
 
-The `aisounds` CLI is published on npm. You can run it directly with `npx`:
+The CLI is published on npm as **`@aisounds/cli`** (the binary it installs is named `aisounds`). You can run it directly with `npx`:
 
 ```bash
-npx aisounds@latest <command> [options]
+npx @aisounds/cli@latest <command> [options]
+```
+
+Or install it globally and use the shorter `aisounds` binary:
+
+```bash
+npm install -g @aisounds/cli
+aisounds <command> [options]
 ```
 
 ## Common flags
@@ -33,9 +40,9 @@ If no pack is currently active in the target scope, the newly installed pack is 
 **Examples**
 
 ```bash
-npx aisounds@latest install retro-beeps --tool cursor
-npx aisounds@latest install retro-beeps --tool claude-code --global
-npx aisounds@latest install retro-beeps --tool cursor --project ./my-app
+npx @aisounds/cli@latest install retro-beeps --tool cursor
+npx @aisounds/cli@latest install retro-beeps --tool claude-code --global
+npx @aisounds/cli@latest install retro-beeps --tool cursor --project ./my-app
 ```
 
 ## activate
@@ -49,8 +56,8 @@ aisounds activate <slug> [--global] [--project <path>]
 **Examples**
 
 ```bash
-npx aisounds@latest activate retro-beeps
-npx aisounds@latest activate retro-beeps --global
+npx @aisounds/cli@latest activate retro-beeps
+npx @aisounds/cli@latest activate retro-beeps --global
 ```
 
 ## remove
@@ -66,8 +73,8 @@ By default, hooks are removed from **every tool** the pack was installed for. Pa
 **Examples**
 
 ```bash
-npx aisounds@latest remove retro-beeps
-npx aisounds@latest remove retro-beeps --tool cursor
+npx @aisounds/cli@latest remove retro-beeps
+npx @aisounds/cli@latest remove retro-beeps --tool cursor
 ```
 
 ## list

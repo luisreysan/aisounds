@@ -1,6 +1,6 @@
 # Getting started
 
-This guide walks you through installing the `aisounds` CLI and adding your first sound pack to **Cursor** or **Claude Code**.
+This guide walks you through installing the **`@aisounds/cli`** package (its binary is `aisounds`) and adding your first sound pack to **Cursor** or **Claude Code**.
 
 ## Prerequisites
 
@@ -17,15 +17,15 @@ Browse aisounds.dev/packs and copy the slug of any pack you like. Every pack pag
 Run the CLI from the root of the project where you want sounds to play. The pack is downloaded and the corresponding tool's hook config is updated automatically.
 
 ```bash
-npx aisounds@latest install <slug> --tool cursor
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool cursor
+npx @aisounds/cli@latest activate <slug>
 ```
 
 For Claude Code, just change the tool flag:
 
 ```bash
-npx aisounds@latest install <slug> --tool claude-code
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool claude-code
+npx @aisounds/cli@latest activate <slug>
 ```
 
 ## 3. Install globally (optional)
@@ -33,8 +33,8 @@ npx aisounds@latest activate <slug>
 If you want the same pack to apply across all your projects, use `--global`:
 
 ```bash
-npx aisounds@latest install <slug> --tool claude-code --global
-npx aisounds@latest activate <slug> --global
+npx @aisounds/cli@latest install <slug> --tool claude-code --global
+npx @aisounds/cli@latest activate <slug> --global
 ```
 
 Global installs write to `~/.claude/settings.json` (Claude Code) or your tool's user-level config. See Concepts: tools and scopes for the full breakdown.
@@ -50,7 +50,7 @@ Most tools only re-read their hook configuration on startup. **Close and reopen*
 
 If nothing plays:
 
-- Verify the pack was installed: `npx aisounds@latest list`
+- Verify the pack was installed: `npx @aisounds/cli@latest list`
 - Verify the pack is active: the active pack appears with a `*` next to it
 - Inspect the tool's hook config (`.cursor/hooks.json` or `.claude/settings.json`)
 - Try the audio command from the hook directly in your terminal

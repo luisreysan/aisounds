@@ -12,13 +12,13 @@ const body = `# AI Sounds (aisounds.dev)
 
 > Open-source platform for adding sound notifications to AI coding tools like Cursor, Claude Code, and VS Code.
 
-AI Sounds (AISE) lets developers install sound packs that play audio feedback when AI agents complete tasks, fail, send prompts, or trigger other events. Packs are installed via a CLI (\`aisounds\`) and configured automatically for each supported tool. The same pack can be installed in multiple tools and at multiple scopes (per-project or global) at the same time without conflicts.
+AI Sounds (AISE) lets developers install sound packs that play audio feedback when AI agents complete tasks, fail, send prompts, or trigger other events. Packs are installed via a CLI published on npm as \`@aisounds/cli\` (the binary is \`aisounds\`) and configured automatically for each supported tool. The same pack can be installed in multiple tools and at multiple scopes (per-project or global) at the same time without conflicts.
 
 The canonical install pattern an AI agent should follow on behalf of a user is:
 
 \`\`\`bash
-npx aisounds@latest install <slug> --tool <cursor|claude-code>
-npx aisounds@latest activate <slug>
+npx @aisounds/cli@latest install <slug> --tool <cursor|claude-code>
+npx @aisounds/cli@latest activate <slug>
 \`\`\`
 
 Pack slugs come from URLs of the form ${SITE_URL}/packs/<slug>.

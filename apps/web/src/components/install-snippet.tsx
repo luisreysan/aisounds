@@ -35,7 +35,7 @@ function toolLabel(slug: string): string {
 }
 
 function buildCommand(slug: string, tool: string): string {
-  return `npx aisounds@latest install ${slug} --tool ${tool}`
+  return `npx @aisounds/cli@latest install ${slug} --tool ${tool}`
 }
 
 function buildPrompt(slug: string, name: string, tool: string): string {
@@ -47,8 +47,8 @@ function buildPrompt(slug: string, name: string, tool: string): string {
     `Install the sound pack "${name}" from aisounds.dev for ${label}.`,
     '',
     'Steps:',
-    `1. Run in terminal: npx aisounds@latest install ${slug} --tool ${tool}`,
-    `2. Run in terminal: npx aisounds@latest activate ${slug}`,
+    `1. Run in terminal: npx @aisounds/cli@latest install ${slug} --tool ${tool}`,
+    `2. Run in terminal: npx @aisounds/cli@latest activate ${slug}`,
   ]
   if (verify) {
     lines.push(`3. ${verify}`)
