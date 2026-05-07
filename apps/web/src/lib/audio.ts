@@ -99,7 +99,12 @@ export async function transcodeAudio(
 
     const durationMs = oggDuration || mp3Duration
     if (!durationMs || durationMs <= 0) {
-      throw new AudioTranscodeError('Could not detect audio duration')
+      const probedDuration = await probeDurationMs(oggPath).catch(() => 0)
+      if (!probedDuration || probedDuration <= 0) {
+        throw new AudioTranscodeError('Could not detect audio duration')
+      }
+      const [oggBuffer, mp3Buffer] = await Promise.all([readFile(oggPath), readFile(mp3Path)])
+      return { oggBuffer, mp3Buffer, durationMs: probedDuration }
     }
 
     const [oggBuffer, mp3Buffer] = await Promise.all([readFile(oggPath), readFile(mp3Path)])
@@ -125,6 +130,9 @@ function runFfmpeg(
     let ffmpegStderr = ''
     const cmd = ffmpeg(inputPath).on('codecData', (data) => {
       durationMs = parseDurationString(data?.duration) ?? durationMs
+    })
+    cmd.on('progress', (progress) => {
+      durationMs = parseDurationString(progress?.timemark) ?? durationMs
     })
     if (forcedInputFormat) {
       cmd.inputFormat(forcedInputFormat)
@@ -189,4 +197,15 @@ function extractExtension(name: string): string | null {
 function hasMissingLameEncoder(error: AudioTranscodeError): boolean {
   const text = `${error.message}\n${error.ffmpegDetails ?? ''}`.toLowerCase()
   return text.includes("unknown encoder 'libmp3lame'") || text.includes('unknown encoder "libmp3lame"')
+}
+
+function probeDurationMs(path: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(path, (error, metadata) => {
+      if (error) return reject(error)
+      const seconds = metadata?.format?.duration
+      if (!seconds || Number.isNaN(seconds)) return resolve(0)
+      resolve(Math.max(0, Math.round(seconds * 1000)))
+    })
+  })
 }
