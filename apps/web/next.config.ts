@@ -9,15 +9,9 @@ const nextConfig: NextConfig = {
   // ffmpeg-static and fluent-ffmpeg must not be bundled — they read binaries at runtime
   serverExternalPackages: ['fluent-ffmpeg', 'ffmpeg-static'],
   outputFileTracingIncludes: {
-    // Ensure ffmpeg-static binary is packaged with the upload route on Vercel.
-    '/api/upload/sound': [
-      'node_modules/.pnpm/ffmpeg-static@*/node_modules/ffmpeg-static/**',
-      'node_modules/ffmpeg-static/**',
-    ],
-    '/api/upload/sound/route': [
-      'node_modules/.pnpm/ffmpeg-static@*/node_modules/ffmpeg-static/**',
-      'node_modules/ffmpeg-static/**',
-    ],
+    // Package the copied ffmpeg binary from a real (non-symlink) app directory.
+    '/api/upload/sound': ['.ffmpeg/**'],
+    '/api/upload/sound/route': ['.ffmpeg/**'],
   },
   images: {
     remotePatterns: [

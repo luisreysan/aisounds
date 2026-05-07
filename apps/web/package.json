@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 3000",
-    "build": "pnpm rebuild ffmpeg-static && next build",
+    "build": "pnpm rebuild ffmpeg-static && node scripts/prepare-ffmpeg.cjs && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",

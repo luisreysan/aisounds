@@ -236,7 +236,9 @@ function resolveFfmpegBinary(): { path: string | null; reason: string | null } {
   }
 
   candidates.add(join(process.cwd(), 'node_modules', 'ffmpeg-static', executableName))
+  candidates.add(join(process.cwd(), '.ffmpeg', executableName))
   candidates.add(join('/var/task/node_modules/ffmpeg-static', executableName))
+  candidates.add(join('/var/task/.ffmpeg', executableName))
 
   for (const candidate of candidates) {
     if (!existsSync(candidate)) {
