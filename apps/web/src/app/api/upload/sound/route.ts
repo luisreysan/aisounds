@@ -105,9 +105,10 @@ export async function POST(req: Request) {
       const detailText = err.ffmpegDetails
         ? ` ffmpeg details: ${err.ffmpegDetails.replace(/\s+/g, ' ').trim()}`
         : ''
+      const reasonText = err.message ? ` reason: ${err.message}` : ''
       return NextResponse.json(
         {
-          error: `Could not process audio. Upload one of: ${FILE_RULES.accepted_extensions.join(', ')}. The file will be transcoded to ogg/mp3.${detailText}`,
+          error: `Could not process audio. Upload one of: ${FILE_RULES.accepted_extensions.join(', ')}. The file will be transcoded to ogg/mp3.${reasonText}${detailText}`,
         },
         { status: 422 },
       )
