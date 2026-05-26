@@ -52,11 +52,33 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        neon: 'hsl(var(--neon))',
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        retro: 'var(--retro-shadow)',
+        neon: '0 0 20px hsl(var(--neon) / 0.35), 0 0 40px hsl(var(--neon) / 0.1)',
+      },
+      keyframes: {
+        'grid-pulse': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.7' },
+        },
+        glitch: {
+          '0%, 100%': { transform: 'translate(0)' },
+          '20%': { transform: 'translate(-1px, 1px)' },
+          '40%': { transform: 'translate(1px, -1px)' },
+          '60%': { transform: 'translate(-1px, -1px)' },
+          '80%': { transform: 'translate(1px, 1px)' },
+        },
+      },
+      animation: {
+        'grid-pulse': 'grid-pulse 4s ease-in-out infinite',
+        glitch: 'glitch 0.3s ease-in-out',
       },
     },
   },

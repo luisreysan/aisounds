@@ -54,7 +54,7 @@ export default async function PackDetailPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
-      <section className="relative overflow-hidden rounded-2xl border border-border/60 p-8 text-white shadow-sm">
+      <section className="relative overflow-hidden rounded-2xl border-2 border-border p-8 text-white shadow-retro dark:shadow-neon">
         <div
           className="absolute inset-0 scale-110"
           style={{ background: gradient, filter: 'blur(0.3rem)' }}
@@ -73,7 +73,7 @@ export default async function PackDetailPage({
                 </>
               ) : null}
             </div>
-            <h1 className="text-4xl font-semibold tracking-tight drop-shadow">{pack.name}</h1>
+            <h1 className="font-mono text-4xl font-bold tracking-tight drop-shadow">{pack.name}</h1>
             {pack.description ? (
               <p className="max-w-2xl text-sm leading-relaxed opacity-90">{pack.description}</p>
             ) : null}
@@ -179,7 +179,7 @@ export default async function PackDetailPage({
 
       <section className="space-y-4">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">Sounds</h2>
+          <h2 className="font-mono text-xl font-semibold">Sounds</h2>
           <span className="text-sm text-muted-foreground">
             {sounds.length} event{sounds.length === 1 ? '' : 's'} mapped
           </span>

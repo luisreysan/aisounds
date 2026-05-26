@@ -51,11 +51,11 @@ export default async function LeaderboardPage({
       <header className="flex flex-col gap-3">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Trophy className="h-4 w-4 text-amber-500" aria-hidden />
+            <div className="retro-label mb-2 inline-flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-primary" aria-hidden />
               Community rankings
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight">Leaderboard</h1>
+            <h1 className="retro-heading">Leaderboard</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
               See which packs and creators are climbing the charts. Rankings use an engagement
               score: votes × 5 + downloads.
@@ -75,7 +75,7 @@ export default async function LeaderboardPage({
       <section className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <nav
-            className="inline-flex h-9 items-center rounded-lg bg-muted p-1 text-muted-foreground"
+            className="inline-flex h-9 items-center rounded-lg border-2 border-border bg-muted p-1 text-muted-foreground"
             aria-label="Leaderboard category"
           >
             <Link
@@ -182,7 +182,7 @@ function LeaderboardEmpty({
     period === 'week' ? 'this week' : period === 'month' ? 'this month' : 'yet'
 
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/60 bg-card/30 px-6 py-16 text-center">
+    <div className="retro-card flex flex-col items-center justify-center gap-3 border-dashed px-6 py-16 text-center">
       <Trophy className="h-10 w-10 text-muted-foreground" />
       <h2 className="text-lg font-medium">No rankings {periodLabel}</h2>
       <p className="max-w-md text-sm text-muted-foreground">

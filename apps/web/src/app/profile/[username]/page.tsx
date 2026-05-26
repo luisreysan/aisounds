@@ -49,7 +49,7 @@ export default async function ProfilePage({
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
-      <header className="flex flex-col gap-6 rounded-2xl border border-border/60 bg-card/30 p-6 md:flex-row md:items-center md:justify-between">
+      <header className="retro-card flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 ring-2 ring-border">
             {profile.avatar_url ? (
@@ -58,7 +58,7 @@ export default async function ProfilePage({
             <AvatarFallback>{profile.username.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="font-mono text-2xl font-bold tracking-tight">
               {profile.display_name ?? profile.username}
             </h1>
             <div className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -109,7 +109,7 @@ export default async function ProfilePage({
 
       <section className="space-y-4">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold">
+          <h2 className="font-mono text-lg font-semibold">
             {isOwner ? 'Your packs' : 'Published packs'}
           </h2>
           {isOwner && draftCount > 0 ? (
@@ -120,7 +120,7 @@ export default async function ProfilePage({
         </div>
 
         {packs.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-10 text-center text-sm text-muted-foreground">
+          <div className="retro-card border-dashed p-10 text-center text-sm text-muted-foreground">
             {isOwner
               ? 'You have no packs yet. Upload your first one to get started.'
               : 'This user has not published any packs yet.'}

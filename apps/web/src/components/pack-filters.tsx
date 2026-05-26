@@ -58,7 +58,7 @@ export function PackFilters() {
         <Input
           name="q"
           defaultValue={q}
-          placeholder="Search packs..."
+          placeholder="Search packs, creators, tags..."
           className="pl-8"
           aria-label="Search packs"
         />

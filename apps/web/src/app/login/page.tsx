@@ -26,8 +26,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col items-center justify-center gap-6 px-6 py-16 text-center">
-      <div className="w-full rounded-xl border border-border bg-card/40 p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold tracking-tight">Sign in to AI Sounds</h1>
+      <div className="retro-card w-full p-8">
+        <h1 className="font-mono text-2xl font-bold tracking-tight">Sign in to AI Sounds</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           GitHub is the only way in — we never ask for email or passwords.
         </p>

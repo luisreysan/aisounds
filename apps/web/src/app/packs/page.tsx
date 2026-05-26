@@ -40,7 +40,7 @@ export default async function PacksPage({
       <header className="flex flex-col gap-3">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Sound packs</h1>
+            <h1 className="retro-heading">Sound packs</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
               Browse the community catalog and pick a pack that fits your flow. Install with
               one command through the <code className="font-mono text-xs">aisounds</code> CLI
@@ -79,7 +79,7 @@ async function PackResults({
 
   if (packs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/60 bg-card/30 px-6 py-16 text-center">
+      <div className="retro-card flex flex-col items-center justify-center gap-3 border-dashed px-6 py-16 text-center">
         <Music2 className="h-10 w-10 text-muted-foreground" />
         <h2 className="text-lg font-medium">No packs match these filters yet.</h2>
         <p className="max-w-md text-sm text-muted-foreground">

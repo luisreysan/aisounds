@@ -45,7 +45,7 @@ export function DocsNav() {
     <nav aria-label="Docs navigation" className="flex flex-col gap-6 text-sm">
       {DOCS_NAV.map((section) => (
         <div key={section.title} className="flex flex-col gap-1">
-          <h4 className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h4 className="retro-label px-2">
             {section.title}
           </h4>
           <ul className="flex flex-col gap-0.5">
@@ -56,10 +56,10 @@ export function DocsNav() {
                   <Link
                     href={item.href}
                     className={cn(
-                      'block rounded-md px-2 py-1 text-sm transition-colors',
+                      'block rounded-md border border-transparent px-2 py-1 font-mono text-sm transition-all',
                       active
-                        ? 'bg-muted font-medium text-foreground'
-                        : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+                        ? 'border-border bg-accent font-semibold text-accent-foreground shadow-retro dark:bg-primary/15 dark:text-primary dark:shadow-neon'
+                        : 'text-muted-foreground hover:border-border hover:bg-muted/60 hover:text-foreground',
                     )}
                   >
                     {item.label}
