@@ -108,11 +108,13 @@ export default async function PackDetailPage({
             <div className="flex items-center gap-3">
               <VoteButton
                 packId={pack.id}
+                packSlug={pack.slug}
                 initialVoted={initialVoted}
                 initialCount={pack.vote_count}
                 isAuthenticated={isAuthed}
+                onHero
               />
-              <DownloadButton packSlug={pack.slug} soundCount={sounds.length} />
+              <DownloadButton packSlug={pack.slug} soundCount={sounds.length} onHero />
             </div>
             <InstallSnippet
               packSlug={pack.slug}

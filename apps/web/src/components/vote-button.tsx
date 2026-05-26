@@ -16,6 +16,8 @@ export interface VoteButtonProps {
   initialCount: number
   isAuthenticated: boolean
   size?: 'sm' | 'default'
+  /** Use on pack detail hero (gradient + inherited text-white). */
+  onHero?: boolean
 }
 
 type VoteState = { voted: boolean; count: number }
@@ -27,6 +29,7 @@ export function VoteButton({
   initialCount,
   isAuthenticated,
   size = 'default',
+  onHero = false,
 }: VoteButtonProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
@@ -62,9 +65,15 @@ export function VoteButton({
     <Button
       type="button"
       onClick={onClick}
-      variant={state.voted ? 'default' : 'outline'}
+      variant={onHero ? 'ghost' : state.voted ? 'default' : 'outline'}
       size={size}
-      className={cn(state.voted && 'border-transparent')}
+      className={cn(
+        onHero &&
+          (state.voted
+            ? 'border-transparent bg-white/25 text-white hover:bg-white/35 hover:text-white'
+            : 'border-white/40 bg-black/25 text-white hover:bg-black/35 hover:text-white'),
+        !onHero && state.voted && 'border-transparent',
+      )}
       aria-pressed={state.voted}
     >
       <Heart className={cn('h-4 w-4', state.voted && 'fill-current')} />

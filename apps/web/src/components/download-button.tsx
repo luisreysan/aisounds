@@ -5,18 +5,21 @@ import { Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export interface DownloadButtonProps {
   packSlug: string
   /** Number of sounds in the pack — used only to decide the empty state. */
   soundCount: number
+  /** Use on pack detail hero (gradient + inherited text-white). */
+  onHero?: boolean
 }
 
 /**
  * Triggers the server bundle endpoint (`/api/packs/<slug>/bundle`). Download
  * counts are recorded only by that endpoint (single source of truth).
  */
-export function DownloadButton({ packSlug, soundCount }: DownloadButtonProps) {
+export function DownloadButton({ packSlug, soundCount, onHero = false }: DownloadButtonProps) {
   const [isPending, startTransition] = useTransition()
 
   const onClick = () => {
@@ -47,7 +50,16 @@ export function DownloadButton({ packSlug, soundCount }: DownloadButtonProps) {
   }
 
   return (
-    <Button type="button" onClick={onClick} disabled={isPending}>
+    <Button
+      type="button"
+      onClick={onClick}
+      disabled={isPending}
+      variant={onHero ? 'ghost' : 'default'}
+      className={cn(
+        onHero &&
+          'border border-white/40 bg-black/25 text-white hover:bg-black/35 hover:text-white',
+      )}
+    >
       {isPending ? <Loader2 className="animate-spin" /> : <Download />}
       Download
     </Button>

@@ -130,7 +130,7 @@ export function InstallSnippet({ packSlug, packName, tools }: InstallSnippetProp
   )
 
   return (
-    <Tabs defaultValue="terminal" className="w-full">
+    <Tabs defaultValue="chat" className="w-full">
       <div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur">
         <div className="flex items-center justify-between gap-2 px-3 pt-2">
           <TabsList className="h-7 bg-white/10 p-0.5">
