@@ -12,13 +12,14 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/90 backdrop-blur-md dark:border-border/80 dark:bg-background/80">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="group flex items-center gap-2.5">
-          <span
-            aria-hidden
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border-2 border-border bg-accent font-mono text-[11px] font-bold text-accent-foreground shadow-retro transition-transform group-hover:scale-105 dark:border-primary/50 dark:bg-primary/20 dark:text-primary dark:shadow-neon"
-          >
-            AI
-          </span>
+        <Link href="/" className="group flex items-center gap-2.5" aria-label="AI Sounds home">
+          <img
+            src="/logo.png"
+            alt=""
+            width={40}
+            height={32}
+            className="h-8 w-auto transition-transform group-hover:scale-105"
+          />
           <span className="font-mono text-sm font-bold tracking-tight">AI Sounds</span>
         </Link>
 
