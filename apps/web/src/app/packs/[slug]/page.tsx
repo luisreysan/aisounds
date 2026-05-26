@@ -112,11 +112,7 @@ export default async function PackDetailPage({
                 initialCount={pack.vote_count}
                 isAuthenticated={isAuthed}
               />
-              <DownloadButton
-                packId={pack.id}
-                packSlug={pack.slug}
-                soundCount={sounds.length}
-              />
+              <DownloadButton packSlug={pack.slug} soundCount={sounds.length} />
             </div>
             <InstallSnippet
               packSlug={pack.slug}

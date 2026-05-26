@@ -42,7 +42,7 @@ Run 'aisounds <command> --help' for detailed usage of each command.
 program
   .command('install <slug>')
   .description('install a pack from aisounds.dev into a supported AI coding tool')
-  .option('--tool <tool>', 'target tool (cursor, claude-code; vscode, windsurf, aider coming soon)')
+  .option('--tool <tool>', 'target tool (cursor, claude-code, vscode; windsurf, aider coming soon)')
   .option('--global', 'install globally instead of per-project', false)
   .option('--project <path>', 'project path for scoped install')
   .addHelpText(

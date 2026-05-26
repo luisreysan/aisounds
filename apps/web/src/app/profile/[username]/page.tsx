@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { PackGrid } from '@/components/pack-grid'
 import { getSessionUser } from '@/lib/auth'
 import { formatRelativeTime } from '@/lib/format'
+import { TierBadge } from '@/components/leaderboard/tier-badge'
 import { getProfileByUsername, listPacksByAuthor } from '@/lib/profiles'
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +45,7 @@ export default async function ProfilePage({
 
   const totalVotes = packs.reduce((sum, p) => sum + (p.vote_count ?? 0), 0)
   const totalDownloads = packs.reduce((sum, p) => sum + (p.download_count ?? 0), 0)
+  const creatorScore = totalVotes * 5 + totalDownloads
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -64,6 +66,7 @@ export default async function ProfilePage({
               <span>·</span>
               <span>joined {formatRelativeTime(profile.created_at)}</span>
               {profile.is_admin ? <Badge variant="secondary">admin</Badge> : null}
+              {publishedCount > 0 ? <TierBadge score={creatorScore} /> : null}
             </div>
             {profile.bio ? (
               <p className="mt-2 max-w-xl text-sm text-muted-foreground">{profile.bio}</p>

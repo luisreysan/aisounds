@@ -5,22 +5,18 @@ import { Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { recordDownloadAction } from '@/app/packs/actions'
 
 export interface DownloadButtonProps {
-  packId: string
   packSlug: string
   /** Number of sounds in the pack — used only to decide the empty state. */
   soundCount: number
 }
 
 /**
- * Triggers the server bundle endpoint (`/api/packs/<slug>/bundle`). That
- * endpoint already inserts a `downloads` row, but we also call
- * `recordDownloadAction` client-side so the platform comes from the user's
- * browser rather than being guessed from the request headers.
+ * Triggers the server bundle endpoint (`/api/packs/<slug>/bundle`). Download
+ * counts are recorded only by that endpoint (single source of truth).
  */
-export function DownloadButton({ packId, packSlug, soundCount }: DownloadButtonProps) {
+export function DownloadButton({ packSlug, soundCount }: DownloadButtonProps) {
   const [isPending, startTransition] = useTransition()
 
   const onClick = () => {
@@ -31,12 +27,6 @@ export function DownloadButton({ packId, packSlug, soundCount }: DownloadButtonP
 
     startTransition(async () => {
       const platform = detectPlatform()
-      try {
-        await recordDownloadAction(packId, { platform })
-      } catch (err) {
-        console.warn('[download] record failed', err)
-      }
-
       const params = new URLSearchParams()
       if (platform) params.set('platform', platform)
       const url = `/api/packs/${encodeURIComponent(packSlug)}/bundle${

@@ -18,7 +18,6 @@ export interface PackMeta {
     name: string
     description: string | null
     license: string
-    cover_color: string | null
     aise_version: string
     author: {
       username: string

@@ -7,12 +7,13 @@ import type { SupportedTool } from '@aisounds/core'
 import { claudeCodeInstaller } from './claude-code.js'
 import { cursorInstaller } from './cursor.js'
 import { createStubInstaller } from './stub.js'
+import { vscodeInstaller } from './vscode.js'
 import type { Installer } from './types.js'
 
 const INSTALLERS: Record<SupportedTool, Installer> = {
   cursor: cursorInstaller,
   'claude-code': claudeCodeInstaller,
-  vscode: createStubInstaller('vscode', 'VS Code + Copilot'),
+  vscode: vscodeInstaller,
   windsurf: createStubInstaller('windsurf', 'Windsurf'),
   aider: createStubInstaller('aider', 'Aider'),
 }

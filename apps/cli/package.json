@@ -1,6 +1,6 @@
 {
   "name": "@aisounds/cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI to install and manage AI Sounds packs for Cursor, VS Code, Claude Code, Windsurf and more.",
   "license": "Apache-2.0",
   "type": "module",
@@ -22,6 +22,18 @@
     "sound-pack",
     "cli"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luisreysan/aisounds.git",
+    "directory": "apps/cli"
+  },
+  "homepage": "https://aisounds.dev/docs/cli",
+  "bugs": {
+    "url": "https://github.com/luisreysan/aisounds/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   },

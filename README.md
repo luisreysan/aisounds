@@ -136,10 +136,11 @@ waveform player, optimistic voting, `/profile/[username]`, and the full
 [docs/upload-flow.md](docs/upload-flow.md) for the architecture.
 - **Phase 4** 🚧 downloadable `.zip` bundles via
 `/api/packs/[slug]/bundle`, lightweight metadata at
-`/api/packs/[slug]/meta`, and a real `aisounds` CLI with working
-`install` / `remove` / `list` / `info` / `update` / `preview` commands
-for Cursor and Claude Code (VS Code, Windsurf and Aider are advertised
-as "coming soon" stubs).
+`/api/packs/[slug]/meta`, and a real `aisounds` CLI (`npx @aisounds/cli`)
+with working `install` / `remove` / `list` / `info` / `update` / `preview`
+/ `activate` / `sounds` for Cursor and Claude Code, plus a VS Code installer
+that writes `.vscode/aisounds.json` and play scripts (Windsurf and Aider
+remain "coming soon" stubs).
 - **Phase 5** ⏳ Remix UI, remaining tool installers, cached bundles in
 Storage.
 

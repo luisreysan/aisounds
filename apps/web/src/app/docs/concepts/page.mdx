@@ -33,12 +33,15 @@ Same pack, same audio files under `.aisounds/packs/<slug>/`, but each tool gets 
 |------|----------------|----------------------------|
 | **Cursor** | `.cursor/hooks.json` + scripts in `.cursor/hooks/aisounds/` | `stop`, `sessionStart`, `beforeSubmitPrompt`, `preToolUse` |
 | **Claude Code** | `.claude/settings.json` (`hooks` block) | `Stop`, `StopFailure`, `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PermissionRequest`, `Notification` |
+| **VS Code** | `.vscode/aisounds.json` + scripts in `.vscode/aisounds/` | `onChatResponseComplete`, `onChatRequestSent`, `onToolInvocation` (scripts; Copilot has no public auto-hooks yet) |
+| **Windsurf / Aider** | — | Coming soon — use `--tool cursor` or `--tool claude-code` today |
 
 You select the tool with `--tool` on `install`:
 
 ```bash
 npx @aisounds/cli@latest install retro-beeps --tool cursor
 npx @aisounds/cli@latest install retro-beeps --tool claude-code
+npx @aisounds/cli@latest install retro-beeps --tool vscode
 ```
 
 You can run both commands to install the same pack in **both** tools. They don't conflict — they write to different config files.

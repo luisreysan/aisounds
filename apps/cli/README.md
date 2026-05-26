@@ -1,7 +1,7 @@
 # aisounds
 
 CLI to install and manage [AI Sounds](https://aisounds.dev) packs for AI coding
-tools (Cursor, Claude Code; VS Code + Copilot, Windsurf and Aider are coming
+tools (Cursor, Claude Code, VS Code; Windsurf and Aider installers are coming
 soon).
 
 ## Commands
@@ -10,10 +10,13 @@ soon).
 npx @aisounds/cli install <slug>                   # install a pack (auto-detect tool)
 npx @aisounds/cli install <slug> --tool cursor     # target a specific tool
 npx @aisounds/cli install <slug> --tool claude-code
+npx @aisounds/cli install <slug> --tool vscode
 npx @aisounds/cli install <slug> --global          # install into $HOME (default: project)
+npx @aisounds/cli activate <slug>                  # set the active pack (hooks play from this pack)
 npx @aisounds/cli remove  <slug>                   # revert the installer, keep user hooks
-npx @aisounds/cli list                             # installed packs (project + global)
+npx @aisounds/cli list                             # installed packs (project + global); * = active
 npx @aisounds/cli info    <slug>                   # metadata from aisounds.dev
+npx @aisounds/cli sounds  <slug>                   # enable/disable individual events (interactive)
 npx @aisounds/cli update                           # re-install packs whose upstream changed
 npx @aisounds/cli preview <slug>                   # play every sound of a pack
 ```
@@ -39,10 +42,18 @@ touching hand-authored hooks:
 | Tool          | Config file                                             | Event mapping                                                                   |
 | ------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | `cursor`      | `.cursor/hooks.json` (global: `~/.cursor/hooks.json`)   | Uses `CURSOR_EVENT_MAP` from `@aisounds/core`                                   |
-| `claude-code` | `.claude/settings.json` (global: `~/.claude/settings.json`) | Uses `CLAUDE_EVENT_MAP` — `task_complete` → `PostToolUse`, `notification` → `Notification`, etc. |
+| `claude-code` | `.claude/settings.json` (global: `~/.claude/settings.json`) | Uses `CLAUDE_EVENT_MAP`                                                       |
+| `vscode`      | `.vscode/aisounds.json` + `.vscode/aisounds/*.sh`       | Uses `VSCODE_EVENT_MAP`; scripts ready for tasks/extension (see note below)    |
+| `windsurf`    | —                                                       | Coming soon                                                                     |
+| `aider`       | —                                                       | Coming soon                                                                     |
+
+**VS Code note:** GitHub Copilot does not expose stable public lifecycle hooks
+equivalent to Cursor's `hooks.json`. The VS Code installer writes
+`.vscode/aisounds.json` and play scripts you can bind to tasks or a future
+AI Sounds extension. Use `aisounds preview` to hear the pack immediately.
 
 The locally installed state lives at `<scope>/.aisounds/installed.json`.
-That's what powers `aisounds list` and `aisounds update`.
+That's what powers `aisounds list`, `aisounds update`, and `aisounds activate`.
 
 ## Environment
 
@@ -79,5 +90,11 @@ pnpm --filter @aisounds/cli type-check
 Run the local build directly against a dev server:
 
 ```bash
-AISOUNDS_API_URL=http://localhost:3000 node apps/cli/dist/index.js install welcome-pack
+AISOUNDS_API_URL=http://localhost:3000 node apps/cli/dist/index.js install universfield
+```
+
+Publish to npm (from `apps/cli` after tests pass):
+
+```bash
+pnpm test && npm publish
 ```
