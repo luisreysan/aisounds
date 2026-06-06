@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono'
 
 import { InvertProvider } from '@/components/pixel/invert-provider'
 import { PixelShell } from '@/components/pixel/pixel-shell'
+import { ThemeScript } from '@/components/pixel/theme-script'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -25,10 +26,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="night"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="min-h-screen antialiased" suppressHydrationWarning>
         <InvertProvider>
           <PixelShell>{children}</PixelShell>
           <Toaster position="bottom-right" richColors />

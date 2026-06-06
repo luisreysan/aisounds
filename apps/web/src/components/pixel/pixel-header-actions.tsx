@@ -7,16 +7,18 @@ import { useInvert } from '@/components/pixel/invert-provider'
 import { UserMenu, type UserMenuProfile } from '@/components/user-menu'
 
 export function PixelHeaderActions({ profile }: { profile: UserMenuProfile | null }) {
-  const { night, toggle } = useInvert()
+  const { night, toggle, transitioning } = useInvert()
 
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={toggle}
+        disabled={transitioning}
         aria-pressed={night}
         aria-label={night ? 'Switch to day mode' : 'Switch to night mode'}
         className="tl-btn px-3 py-2 text-[11px]"
+        suppressHydrationWarning
       >
         {night ? <MoonStar className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
         <span className="tabular-nums">{night ? 'NIGHT' : 'DAY'}</span>
