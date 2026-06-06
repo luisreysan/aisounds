@@ -21,10 +21,11 @@ export function DesignSwitcher({
         type="button"
         onClick={onToggleAuto}
         aria-pressed={auto}
+        aria-label={auto ? 'Auto rotate designs' : 'Hold current design'}
         className="tl-box-flat inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest"
       >
         {auto ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-        {auto ? 'Auto' : 'Hold'}
+        <span className="hidden sm:inline">{auto ? 'Auto' : 'Hold'}</span>
       </button>
 
       {PIXEL_DESIGNS.map((d, i) => {

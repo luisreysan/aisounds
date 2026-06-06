@@ -54,6 +54,15 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+/** Tailwind `sm` breakpoint — skip CRT/noise transition on mobile viewports. */
+function isMobileViewport(): boolean {
+  return window.matchMedia('(max-width: 639px)').matches
+}
+
+function shouldSkipThemeTransition(): boolean {
+  return prefersReducedMotion() || isMobileViewport()
+}
+
 export function InvertProvider({ children }: { children: React.ReactNode }) {
   const [night, setNight] = useState(DEFAULT_NIGHT)
   const [phase, setPhase] = useState<ThemeTransitionPhase>('idle')
@@ -86,7 +95,7 @@ export function InvertProvider({ children }: { children: React.ReactNode }) {
 
     const next = !night
 
-    if (prefersReducedMotion()) {
+    if (shouldSkipThemeTransition()) {
       applyTheme(next)
       return
     }
