@@ -42,12 +42,10 @@ export const DOCS_NAV: DocsNavSection[] = [
 export function DocsNav() {
   const pathname = usePathname()
   return (
-    <nav aria-label="Docs navigation" className="flex flex-col gap-6 text-sm">
+    <nav aria-label="Docs navigation" className="tl-box-flat flex flex-col gap-4 p-3 text-sm">
       {DOCS_NAV.map((section) => (
         <div key={section.title} className="flex flex-col gap-1">
-          <h4 className="retro-label px-2">
-            {section.title}
-          </h4>
+          <h4 className="tl-label px-1">{section.title}</h4>
           <ul className="flex flex-col gap-0.5">
             {section.items.map((item) => {
               const active = pathname === item.href
@@ -56,10 +54,10 @@ export function DocsNav() {
                   <Link
                     href={item.href}
                     className={cn(
-                      'block rounded-md border border-transparent px-2 py-1 font-mono text-sm transition-all',
+                      'block px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-widest transition-all',
                       active
-                        ? 'border-border bg-accent font-semibold text-accent-foreground shadow-retro dark:bg-primary/15 dark:text-primary dark:shadow-neon'
-                        : 'text-muted-foreground hover:border-border hover:bg-muted/60 hover:text-foreground',
+                        ? 'tl-pill-active'
+                        : 'opacity-70 hover:opacity-100',
                     )}
                   >
                     {item.label}

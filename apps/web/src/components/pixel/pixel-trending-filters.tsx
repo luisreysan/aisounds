@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useTransition } from 'react'
 import { Search } from 'lucide-react'
 
-import { Input } from '@/components/ui/input'
 import { TAG_OPTIONS } from '@/lib/catalog'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +19,7 @@ const FEATURED_TAGS = [
   { slug: 'sci-fi', label: 'Sci-Fi' },
 ] as const
 
-export function HomeTrendingFilters() {
+export function PixelTrendingFilters() {
   const router = useRouter()
   const params = useSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -55,15 +54,16 @@ export function HomeTrendingFilters() {
         }}
       >
         <Search
-          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2"
+          style={{ color: 'hsl(var(--tl-muted))' }}
           aria-hidden
         />
-        <Input
+        <input
           name="q"
           defaultValue={q}
           placeholder="Search packs, creators, tags — lofi, ambient..."
-          className="h-12 rounded-full border-2 border-border bg-card pl-11 pr-4 shadow-retro dark:shadow-none dark:focus-visible:shadow-neon"
           aria-label="Search packs"
+          className="tl-box-flat h-12 w-full pl-11 pr-4 font-mono text-sm outline-none"
         />
       </form>
 
@@ -75,18 +75,13 @@ export function HomeTrendingFilters() {
               key={t.slug}
               type="button"
               onClick={() => apply('tag', t.slug === ALL ? '' : t.slug)}
-              className={cn(
-                'retro-pill',
-                active && 'retro-pill-active',
-              )}
+              className={cn('tl-pill', active && 'tl-pill-active')}
             >
               {t.label}
             </button>
           )
         })}
-        {TAG_OPTIONS.filter(
-          (t) => !FEATURED_TAGS.some((f) => f.slug === t.slug),
-        )
+        {TAG_OPTIONS.filter((t) => !FEATURED_TAGS.some((f) => f.slug === t.slug))
           .slice(0, 4)
           .map((t) => {
             const active = tag === t.slug
@@ -95,7 +90,7 @@ export function HomeTrendingFilters() {
                 key={t.slug}
                 type="button"
                 onClick={() => apply('tag', t.slug)}
-                className={cn('retro-pill hidden sm:inline-flex', active && 'retro-pill-active')}
+                className={cn('tl-pill hidden sm:inline-flex', active && 'tl-pill-active')}
               >
                 {t.label}
               </button>

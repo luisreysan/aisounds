@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
 
-import { FaqSection } from '@/components/faq-section'
-import { HomeHero } from '@/components/home-hero'
-import { HomeTrendingSection } from '@/components/home-trending-section'
+import { PixelFaq } from '@/components/pixel/pixel-faq'
+import { PixelHero } from '@/components/pixel/pixel-hero'
+import { PixelTrendingSection } from '@/components/pixel/pixel-trending-section'
 import { listPacks } from '@/lib/packs'
 
 export const dynamic = 'force-dynamic'
@@ -21,14 +21,14 @@ export default async function HomePage({
   })
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pb-20 pt-8">
-      <HomeHero />
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-16 pt-8 sm:px-6">
+      <PixelHero />
 
       <Suspense fallback={null}>
-        <HomeTrendingSection packs={packs} />
+        <PixelTrendingSection packs={packs} />
       </Suspense>
 
-      <FaqSection />
+      <PixelFaq />
     </main>
   )
 }

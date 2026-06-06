@@ -75,10 +75,30 @@ const config: Config = {
           '60%': { transform: 'translate(-1px, -1px)' },
           '80%': { transform: 'translate(1px, 1px)' },
         },
+        'hue-cycle': {
+          '0%': { filter: 'hue-rotate(0deg)' },
+          '100%': { filter: 'hue-rotate(360deg)' },
+        },
+        scanline: {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '0 100%' },
+        },
+        blink: {
+          '0%, 49%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
       },
       animation: {
         'grid-pulse': 'grid-pulse 4s ease-in-out infinite',
         glitch: 'glitch 0.3s ease-in-out',
+        'hue-cycle': 'hue-cycle 8s linear infinite',
+        scanline: 'scanline 8s linear infinite',
+        blink: 'blink 1s steps(1) infinite',
+        marquee: 'marquee 22s linear infinite',
       },
     },
   },

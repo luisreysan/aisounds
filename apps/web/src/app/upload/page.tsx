@@ -11,8 +11,9 @@ export default async function UploadPage() {
   await requireUser('/upload')
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 sm:px-6">
       <header className="space-y-1.5">
+        <p className="tl-label">{'>'} Create</p>
         <h1 className="retro-heading">Upload a pack</h1>
         <p className="text-sm text-muted-foreground">
           Three steps: set the metadata, upload your sounds, and publish. Required sounds are

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 
-import { SiteHeader } from '@/components/site-header'
-import { ThemeProvider } from '@/components/theme-provider'
+import { InvertProvider } from '@/components/pixel/invert-provider'
+import { PixelShell } from '@/components/pixel/pixel-shell'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -28,12 +28,11 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <ThemeProvider>
-          <SiteHeader />
-          {children}
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <InvertProvider>
+          <PixelShell>{children}</PixelShell>
           <Toaster position="bottom-right" richColors />
-        </ThemeProvider>
+        </InvertProvider>
       </body>
     </html>
   )

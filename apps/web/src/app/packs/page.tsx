@@ -36,7 +36,7 @@ export default async function PacksPage({
   const resolvedSort = normalizeSort(sort)
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6">
       <header className="flex flex-col gap-3">
         <div className="flex items-start justify-between gap-6">
           <div>

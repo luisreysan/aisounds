@@ -4,61 +4,41 @@
 
 @layer base {
   :root {
-    /* Day mode — Glitchtype-inspired: cream paper, black ink, yellow accent */
-    --background: 48 100% 96%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%;
-    --primary-foreground: 48 100% 62%;
+    /* Pixel design system — day palette (night = filter invert on shell) */
+    --tl-bg: 50 38% 92%;
+    --tl-panel: 48 44% 97%;
+    --tl-ink: 240 12% 7%;
+    --tl-muted: 240 6% 38%;
+    --tl-line: 240 12% 12%;
+    --tl-accent: 330 90% 56%;
+    --tl-shadow: 4px 4px 0 0 hsl(var(--tl-ink));
+
+    /* shadcn tokens mapped to pixel palette */
+    --background: var(--tl-bg);
+    --foreground: var(--tl-ink);
+    --card: var(--tl-panel);
+    --card-foreground: var(--tl-ink);
+    --popover: var(--tl-panel);
+    --popover-foreground: var(--tl-ink);
+    --primary: var(--tl-ink);
+    --primary-foreground: var(--tl-panel);
     --secondary: 48 80% 88%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: var(--tl-ink);
     --muted: 48 40% 90%;
-    --muted-foreground: 0 0% 35%;
+    --muted-foreground: var(--tl-muted);
     --accent: 48 100% 62%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: var(--tl-ink);
     --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
-    --ring: 0 0% 0%;
+    --border: var(--tl-ink);
+    --input: var(--tl-ink);
+    --ring: var(--tl-ink);
     --radius: 0.375rem;
 
-    /* Retrofuturist tokens */
     --neon: 280 100% 65%;
     --neon-cyan: 185 100% 50%;
-    --retro-shadow: 4px 4px 0 0 hsl(0 0% 0%);
+    --retro-shadow: var(--tl-shadow);
     --retro-border: 2px;
-  }
-
-  .dark {
-    /* Night mode — deep space, neon violet/cyan */
-    --background: 240 20% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 18% 8%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 18% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 280 100% 70%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 15% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 12% 16%;
-    --muted-foreground: 240 8% 62%;
-    --accent: 185 100% 50%;
-    --accent-foreground: 240 20% 4%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 12% 22%;
-    --input: 240 12% 22%;
-    --ring: 280 100% 70%;
-
-    --neon: 280 100% 70%;
-    --neon-cyan: 185 100% 55%;
-    --retro-shadow: 0 0 24px hsl(280 100% 70% / 0.15);
-    --retro-border: 1px;
   }
 }
 
@@ -68,7 +48,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-mono text-foreground antialiased;
   }
 
   h1,
@@ -77,19 +57,92 @@
   h4 {
     @apply font-mono tracking-tight;
   }
+
+  ::selection {
+    background: hsl(var(--tl-accent));
+    color: hsl(var(--tl-panel));
+  }
 }
 
 @layer components {
-  .retro-card {
-    @apply rounded-xl border-2 border-border bg-card shadow-retro transition-shadow;
+  .tl-box {
+    border: 2px solid hsl(var(--tl-ink));
+    background: hsl(var(--tl-panel));
+    box-shadow: var(--tl-shadow);
   }
 
-  .dark .retro-card {
-    @apply border border-border shadow-none hover:shadow-neon;
+  .tl-box-flat {
+    border: 2px solid hsl(var(--tl-ink));
+    background: hsl(var(--tl-panel));
+  }
+
+  .tl-btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold uppercase tracking-widest;
+    border: 2px solid hsl(var(--tl-ink));
+    background: hsl(var(--tl-panel));
+    box-shadow: var(--tl-shadow);
+    transition:
+      transform 0.08s steps(2),
+      box-shadow 0.08s steps(2);
+  }
+
+  .tl-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0 0 hsl(var(--tl-ink));
+  }
+
+  .tl-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 hsl(var(--tl-ink));
+  }
+
+  .tl-btn-primary {
+    background: hsl(var(--tl-ink));
+    color: hsl(var(--tl-panel));
+  }
+
+  .tl-label {
+    @apply text-[11px] font-bold uppercase tracking-[0.25em];
+    color: hsl(var(--tl-muted));
+  }
+
+  .tl-rgb {
+    background-image: linear-gradient(
+      90deg,
+      #ff004d,
+      #ff8a00,
+      #ffe600,
+      #00e676,
+      #00b3ff,
+      #7c4dff,
+      #ff004d
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: hue-cycle 6s linear infinite;
+  }
+
+  .tl-pill {
+    @apply inline-flex items-center border-2 px-4 py-1.5 text-sm font-bold uppercase tracking-widest transition-all;
+    border-color: hsl(var(--tl-ink));
+    background: hsl(var(--tl-panel));
+  }
+
+  .tl-pill-active {
+    background: hsl(var(--tl-ink));
+    color: hsl(var(--tl-panel));
+    box-shadow: var(--tl-shadow);
+  }
+
+  /* Legacy retro aliases — point to pixel tokens */
+  .retro-card {
+    @apply tl-box;
   }
 
   .retro-label {
-    @apply font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground;
+    @apply tl-label;
   }
 
   .retro-heading {
@@ -97,32 +150,74 @@
   }
 
   .retro-pill {
-    @apply inline-flex items-center rounded-full border-2 border-border px-4 py-1.5 text-sm font-medium transition-all;
+    @apply tl-pill;
   }
 
   .retro-pill-active {
-    @apply border-primary bg-primary text-primary-foreground shadow-retro;
+    @apply tl-pill-active;
   }
 
-  .dark .retro-pill-active {
-    @apply border-primary bg-primary/20 text-primary shadow-neon;
+  /* Docs prose overrides */
+  .tl-prose {
+    --tw-prose-body: hsl(var(--tl-ink));
+    --tw-prose-headings: hsl(var(--tl-ink));
+    --tw-prose-links: hsl(var(--tl-ink));
+    --tw-prose-bold: hsl(var(--tl-ink));
+    --tw-prose-code: hsl(var(--tl-ink));
+    --tw-prose-pre-bg: hsl(var(--tl-panel));
+    --tw-prose-pre-code: hsl(var(--tl-ink));
+    --tw-prose-quotes: hsl(var(--tl-muted));
+    --tw-prose-counters: hsl(var(--tl-muted));
+    --tw-prose-bullets: hsl(var(--tl-muted));
   }
 
-  .retro-grid-bg {
-    background-image:
-      linear-gradient(hsl(var(--border) / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--border) / 0.15) 1px, transparent 1px);
-    background-size: 32px 32px;
+  .tl-prose pre {
+    @apply tl-box-flat;
   }
 
-  .dark .retro-grid-bg {
-    background-image:
-      linear-gradient(hsl(var(--neon) / 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--neon) / 0.06) 1px, transparent 1px);
+  .tl-prose code:not(pre code) {
+    @apply tl-box-flat px-1.5 py-0.5 text-sm;
+  }
+
+  .tl-prose table {
+    @apply tl-box-flat w-full border-collapse;
+  }
+
+  .tl-prose th,
+  .tl-prose td {
+    border: 2px solid hsl(var(--tl-ink));
+    padding: 0.5rem 0.75rem;
   }
 }
 
 @layer utilities {
+  .tl-scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      hsl(var(--tl-ink) / 0.06) 0px,
+      hsl(var(--tl-ink) / 0.06) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  }
+
+  .tl-grid {
+    background-image:
+      linear-gradient(hsl(var(--tl-line) / 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--tl-line) / 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .tl-caret::after {
+    content: '_';
+    @apply animate-blink;
+  }
+
+  /* Counter-invert canvas viewport so designs match page theme */
+  .tl-canvas-invert {
+    filter: invert(1);
+  }
+
   .shadow-retro {
     box-shadow: var(--retro-shadow);
   }
@@ -145,5 +240,14 @@
       hsl(var(--neon) / 0.25),
       transparent 70%
     );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-rgb,
+  .animate-marquee,
+  .animate-blink,
+  .animate-scanline {
+    animation: none !important;
   }
 }

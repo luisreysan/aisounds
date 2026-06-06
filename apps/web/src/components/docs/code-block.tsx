@@ -42,7 +42,7 @@ export function CodeBlock({ children, className, ...rest }: CodeBlockProps) {
       <pre
         ref={preRef}
         className={cn(
-          'overflow-x-auto rounded-lg border border-border/60 bg-muted/40 p-4 text-sm leading-relaxed',
+          'tl-box-flat overflow-x-auto p-4 font-mono text-sm leading-relaxed',
           className,
         )}
         {...rest}

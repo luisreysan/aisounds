@@ -54,7 +54,7 @@ export default async function PackDetailPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
-      <section className="relative overflow-hidden rounded-2xl border-2 border-border p-8 text-white shadow-retro dark:shadow-neon">
+      <section className="tl-box relative overflow-hidden p-8 text-white">
         <div
           className="absolute inset-0 scale-110"
           style={{ background: gradient, filter: 'blur(0.3rem)' }}

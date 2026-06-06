@@ -1,16 +1,4 @@
-'use client'
-
-import { Info } from 'lucide-react'
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import { FadeIn } from '@/components/motion/fade-in'
-
-const FAQ_ITEMS = [
+export const FAQ_ITEMS = [
   {
     id: 'cpu',
     question: 'Is it safe for my CPU performance?',
@@ -42,38 +30,3 @@ const FAQ_ITEMS = [
       'All community packs on AI Sounds are free to browse, download, and install. Licenses vary per pack (CC0, CC-BY, MIT, etc.) — check the pack detail page before remixing or redistributing.',
   },
 ] as const
-
-export function FaqSection() {
-  return (
-    <FadeIn className="space-y-6">
-      <div className="text-center">
-        <p className="retro-label mb-2">Support</p>
-        <h2 className="retro-heading">Frequently asked questions</h2>
-        <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-          Everything you need to know before installing your first pack.
-        </p>
-      </div>
-
-      <Accordion
-        type="single"
-        collapsible
-        className="retro-card divide-y divide-border overflow-hidden px-4 sm:px-6"
-      >
-        {FAQ_ITEMS.map((item) => (
-          <AccordionItem key={item.id} value={item.id} className="border-border">
-            <AccordionTrigger className="gap-3 hover:no-underline">
-              <span className="flex items-start gap-3">
-                <Info
-                  className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                  aria-hidden
-                />
-                <span>{item.question}</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pl-7">{item.answer}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </FadeIn>
-  )
-}

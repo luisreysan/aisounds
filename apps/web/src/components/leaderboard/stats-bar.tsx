@@ -36,7 +36,7 @@ export function StatsBar({ stats }: { stats: PlatformStats }) {
       {items.map((item) => {
         const Icon = item.icon
         const content = (
-          <Card className="flex flex-col gap-2 p-4 transition-all hover:border-primary/40 dark:hover:shadow-neon">
+          <Card className="flex flex-col gap-2 p-4 transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]">
             <div className="retro-label flex items-center gap-2">
               <Icon className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-xs font-medium uppercase tracking-wide">{item.label}</span>
